@@ -87,7 +87,7 @@
 
       function portStyle(input) {
         return {
-          desiredSize: new go.Size(10, 10),
+          desiredSize: new go.Size(20, 20),
           fill: "black",
           fromSpot: go.Spot.Right,
           fromLinkable: !input,
@@ -104,7 +104,7 @@
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
-            { portId: "", alignment: new go.Spot(1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
           { // if double-clicked, an input node will change its value, represented by the color.
             doubleClick: function (e, obj) {
                 e.diagram.startTransaction("Toggle Input");
@@ -155,7 +155,7 @@
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var orTemplate =
@@ -166,18 +166,18 @@
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var xorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "XorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in1", alignment: new go.Spot(0.26, 0.3) }),
+            { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in2", alignment: new go.Spot(0.26, 0.7) }),
+            { portId: "in2", alignment: new go.Spot(0.06, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
             var norTemplate =
@@ -188,18 +188,18 @@
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var xnorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "XnorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in1", alignment: new go.Spot(0.26, 0.3) }),
+            { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in2", alignment: new go.Spot(0.26, 0.7) }),
+            { portId: "in2", alignment: new go.Spot(0.06, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var nandTemplate =
@@ -210,7 +210,7 @@
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0, 0.7) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var notTemplate =
@@ -219,7 +219,7 @@
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in", alignment: new go.Spot(0, 0.5) }),
           $(go.Shape, "Rectangle", portStyle(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
       var heatTemplate =
@@ -229,7 +229,7 @@
 						$(go.Picture, "../assets/hot.png",
               { width: 30, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
-            { portId: "", alignment: new go.Spot(1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 
           { // if double-clicked, an input node will change its value, represented by the color.
             doubleClick: function (e, obj) {
@@ -249,7 +249,7 @@
 						$(go.Picture, "../assets/lighton.png",
               { width: 40, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
-            { portId: "", alignment: new go.Spot(1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 
           { // if double-clicked, an input node will change its value, represented by the color.
             doubleClick: function (e, obj) {
@@ -420,11 +420,11 @@
 </h1>
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
-    <span style="display: inline-block; vertical-align: top; width:210px">
-      <div id="palette" style="border: solid 1px black; height: 560px"></div>
+    <span style="display: inline-block; vertical-align: top; width:230px">
+      <div id="palette" style="border: solid 1px black; height: 580px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width:90%">
-      <div id="myDiagramDiv" style="border: solid 1px black; height: 560px"></div>
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 580px"></div>
     </span>
   </div>
   <p>
