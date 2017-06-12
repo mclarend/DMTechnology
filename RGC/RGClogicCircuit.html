@@ -10,8 +10,8 @@
     <script src="../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->
   <script id="code">
 
-    var red = "orangered";  // 0 or false
-    var green = "forestgreen";  // 1 or true
+    var red = "forestgreen";  // 0 or false
+    var green = "red";  // 1 or true
 
     function init() {
       if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
@@ -46,14 +46,14 @@
           {
             routing: go.Link.AvoidsNodes,
             curve: go.Link.JumpOver,
-            corner: 3,
+            corner: 7,
             relinkableFrom: true, relinkableTo: true,
             selectionAdorned: false, // Links are not adorned when selected so that their color remains visible.
-            shadowOffset: new go.Point(0, 0), shadowBlur: 5, shadowColor: "blue",
+            shadowOffset: new go.Point(0, 0), shadowBlur: 10, shadowColor: "blue",
           },
           new go.Binding("isShadowed", "isSelected").ofObject(),
           $(go.Shape,
-            { name: "SHAPE", strokeWidth: 2, stroke: red }));
+            { name: "SHAPE", strokeWidth: 4, stroke: red }));
 
       // node template helpers
       var sharedToolTip =
@@ -80,14 +80,14 @@
           name: "NODESHAPE",
           fill: "lightgray",
           stroke: "darkslategray",
-          desiredSize: new go.Size(50, 50),
+          desiredSize: new go.Size(70, 70),
           strokeWidth: 2
         };
       }
 
       function portStyle(input) {
         return {
-          desiredSize: new go.Size(6, 6),
+          desiredSize: new go.Size(10, 10),
           fill: "black",
           fromSpot: go.Spot.Right,
           fromLinkable: !input,
@@ -119,8 +119,31 @@
       var outputTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
-            { fill: green }),  // override the default fill (from shapeStyle()) to be green
-          $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+			$(go.Picture, "../assets/lightoutput.png",
+              { width: 45, height: 40 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
+
+      var buzzerTemplate =
+		$(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+			$(go.Picture, "../assets/buzzer.png",
+              { width: 60, height: 60 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
+
+
+      var relayTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+			$(go.Picture, "../assets/relay.png",
+              { width: 60, height: 60 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
 
@@ -157,7 +180,7 @@
             { portId: "out", alignment: new go.Spot(1, 0.5) })
         );
 
-      var norTemplate =
+            var norTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "NorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -199,6 +222,47 @@
             { portId: "out", alignment: new go.Spot(1, 0.5) })
         );
 
+      var heatTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/hot.png",
+              { width: 30, height: 45 }),
+          $(go.Shape, "Rectangle", portStyle(false),  // the only port
+            { portId: "", alignment: new go.Spot(1, 0.5) }),
+
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+          }
+		          );
+				  
+		        var rgclampTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/lighton.png",
+              { width: 40, height: 45 }),
+          $(go.Shape, "Rectangle", portStyle(false),  // the only port
+            { portId: "", alignment: new go.Spot(1, 0.5) }),
+
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+          }
+        );
+
+
       // add the templates created above to myDiagram and palette
       myDiagram.nodeTemplateMap.add("input", inputTemplate);
       myDiagram.nodeTemplateMap.add("output", outputTemplate);
@@ -209,20 +273,27 @@
       myDiagram.nodeTemplateMap.add("nand", nandTemplate);
       myDiagram.nodeTemplateMap.add("nor", norTemplate);
       myDiagram.nodeTemplateMap.add("xnor", xnorTemplate);
-
+	        myDiagram.nodeTemplateMap.add("heat", heatTemplate);
+	        myDiagram.nodeTemplateMap.add("rgclamp", rgclampTemplate);
+			myDiagram.nodeTemplateMap.add("buzzer", buzzerTemplate);
+			myDiagram.nodeTemplateMap.add("relay", relayTemplate);
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
 
       palette.model.nodeDataArray = [
         { category: "input" },
-        { category: "output" },
+		{ category: "heat" },
+		{ category: "rgclamp" },
+        { category: "not" },
         { category: "and" },
         { category: "or" },
         { category: "xor" },
-        { category: "not" },
         { category: "nand" },
-        { category: "nor" },
-        { category: "xnor" }
+       { category: "nor" },
+        { category: "xnor" },
+				{ category: "buzzer" },
+				{ category: "relay" },
+		{ category: "output" },
       ];
 
       // load the initial diagram
@@ -246,6 +317,12 @@
           if (node.category === "input") {
             doInput(node);
           }
+		            if (node.category === "heat") {
+            doInput(node);
+          }
+		  		    if (node.category === "rgclamp") {
+            doInput(node);
+          }
         });
       // now we can do all other kinds of nodes
       myDiagram.nodes.each(function(node) {
@@ -257,8 +334,12 @@
             case "nand":     doNand(node); break;
             case "nor":       doNor(node); break;
             case "xnor":     doXnor(node); break;
+            			case "buzzer": doOutput(node); break;
+			            case "relay": doOutput(node); break;
             case "output": doOutput(node); break;
-            case "input": break;  // doInput already called, above
+            case "heat": break;
+			case "rgclamp": break;
+			case "input": break;  // doInput already called, above
           }
         });
       myDiagram.skipsUndoManager = oldskip;
@@ -334,9 +415,12 @@
   </script>
 </head>
 <body onload="init()">
+<h1 align="center">
+  RGC Technology
+</h1>
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
-    <span style="display: inline-block; vertical-align: top; width:110px">
+    <span style="display: inline-block; vertical-align: top; width:210px">
       <div id="palette" style="border: solid 1px black; height: 560px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width:90%">
@@ -344,43 +428,45 @@
     </span>
   </div>
   <p>
-    The Logic Circuit sample allows the user to make circuits using gates and wires,
-    which are updated whenever a Link is modified and at intervals by a looped setTimeout function.
+    The Logic Circuit allows the user to make circuits using gates and wires,
+    which are updated whenever a Link is modified.
   </p>
   <p>
-    The <b>updateStates</b> function calls a function to update each node according to type,
-    which uses the color of the links into the node to determine the color of those exiting it.
-    Red means zero or false; green means one or true. Double-clicking an input node will toggle true/false.
+    The color of the Inputs (Circles),links and Outputs (Squares) determine the Logic state:
+    Green means Logic 0; Red means Logic 1. Double-clicking an input node will toggle Logic 0/Logic 1.
   </p>
   <p>
     Mouse over a node to see its category, displayed using a shared <a>Adornment</a> set as the tooltip.
     A <a>Palette</a> to the left of the main diagram allows the user to drag and drop new nodes.
     These nodes can then be linked using ports which are defined on the various node templates.
     Each input port can only have one input link, while output ports can have many output links.
-    This is controlled by the <a>GraphObject.toMaxLinks</a> property.
   </p>
   <div>
     <div>
-      <button id="saveModel" onclick="save()">Save</button>
-      <button onclick="load()">Load</button>
-      Diagram Model saved in JSON format:
+      
     </div>
     <textarea id="mySavedModel" style="width:100%;height:0px">
 { "class": "go.GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [
-{"category":"input", "key":"input1", "loc":"-150 -80" },
-{"category":"or", "key":"or1", "loc":"-70 0" },
-{"category":"not", "key":"not1", "loc":"10 0" },
-{"category":"xor", "key":"xor1", "loc":"100 0" },
-{"category":"or", "key":"or2", "loc":"200 0" },
-{"category":"output", "key":"output1", "loc":"200 -100" }
+{"category":"input", "key":"input1", "loc":"-280 -230" },
+{"category":"rgclamp", "key":"rgclamp1", "loc":"-300 -120" },
+{"category":"heat", "key":"heat1", "loc":"-320 -20" },
+{"category":"input", "key":"input2", "loc":"-280 80" },
+
+{"category":"not", "key":"not1", "loc":"-60 -180" },
+{"category":"and", "key":"and1", "loc":"-40 -80" },
+{"category":"or", "key":"or1", "loc":"-40 40" },
+
+{"category":"buzzer", "key":"buzzer1", "loc":"220 -180" },
+{"category":"relay", "key":"relay1", "loc":"220 -80" },
+{"category":"output", "key":"output1", "loc":"220 25" }
  ],
-  "linkDataArray": [
+ "linkDataArray": [
 {"from":"input1", "fromPort":"out", "to":"or1", "toPort":"in1"},
 {"from":"or1", "fromPort":"out", "to":"not1", "toPort":"in"},
-{"from":"not1", "fromPort":"out", "to":"or1", "toPort":"in2"},
+{"from":"and1", "fromPort":"out", "to":"and1", "toPort":"in2"},
 {"from":"not1", "fromPort":"out", "to":"xor1", "toPort":"in1"},
 {"from":"xor1", "fromPort":"out", "to":"or2", "toPort":"in1"},
 {"from":"or2", "fromPort":"out", "to":"xor1", "toPort":"in2"},
