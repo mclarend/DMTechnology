@@ -48,7 +48,7 @@
             curve: go.Link.JumpOver,
             corner: 7,
             relinkableFrom: true, relinkableTo: true,
-            selectionAdorned: false, // Links are not adorned when selected so that their color remains visible.
+            selectionAdorned: false, // Links are NOT adorned when selected so that their color remains visible.
             shadowOffset: new go.Point(0, 0), shadowBlur: 10, shadowColor: "blue",
           },
           new go.Binding("isShadowed", "isSelected").ofObject(),
@@ -99,10 +99,12 @@
       }
 
       // define templates for each type of node
-      var inputTemplate =
+      var SwitchTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/switch.png",
+              { width: 50, height: 50 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
           { // if double-clicked, an input node will change its value, represented by the color.
@@ -115,39 +117,37 @@
               }
           }
         );
-
-      var outputTemplate =
-        $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "Rectangle", shapeStyle(),
-            { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/lightoutput.png",
-              { width: 45, height: 40 }),
-		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
-            { portId: "", alignment: new go.Spot(0, 0.5) })
-        );
-
-      var buzzerTemplate =
+      var LampTemplate =
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/buzzer.png",
+			$(go.Picture, "../assets/lightoutput.png",
+              { width: 60, height: 60 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
+      var BuzzerTemplate =
+		$(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+			$(go.Picture, "../assets/Buzzer.png",
               { width: 60, height: 60 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
 
 
-      var relayTemplate =
+      var RelayTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/relay.png",
+			$(go.Picture, "../assets/Relay.png",
               { width: 60, height: 60 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
 
-      var andTemplate =
+      var ANDTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "AndGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -169,7 +169,7 @@
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
-      var xorTemplate =
+      var xnorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "XorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -191,7 +191,7 @@
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
-      var xnorTemplate =
+      var xorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "XnorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -213,7 +213,7 @@
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
-      var notTemplate =
+      var NOTTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Inverter", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -222,7 +222,7 @@
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
 
-      var heatTemplate =
+      var Heat_SensorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
@@ -242,7 +242,7 @@
           }
 		          );
 				  
-		        var rgclampTemplate =
+		        var Light_SensorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
@@ -264,36 +264,36 @@
 
 
       // add the templates created above to myDiagram and palette
-      myDiagram.nodeTemplateMap.add("input", inputTemplate);
-      myDiagram.nodeTemplateMap.add("output", outputTemplate);
-      myDiagram.nodeTemplateMap.add("and", andTemplate);
-      myDiagram.nodeTemplateMap.add("or", orTemplate);
-      myDiagram.nodeTemplateMap.add("xor", xorTemplate);
-      myDiagram.nodeTemplateMap.add("not", notTemplate);
-      myDiagram.nodeTemplateMap.add("nand", nandTemplate);
-      myDiagram.nodeTemplateMap.add("nor", norTemplate);
-      myDiagram.nodeTemplateMap.add("xnor", xnorTemplate);
-	        myDiagram.nodeTemplateMap.add("heat", heatTemplate);
-	        myDiagram.nodeTemplateMap.add("rgclamp", rgclampTemplate);
-			myDiagram.nodeTemplateMap.add("buzzer", buzzerTemplate);
-			myDiagram.nodeTemplateMap.add("relay", relayTemplate);
+      myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
+	  	        myDiagram.nodeTemplateMap.add("Heat_Sensor", Heat_SensorTemplate);
+	        myDiagram.nodeTemplateMap.add("Light_Sensor", Light_SensorTemplate);
+      myDiagram.nodeTemplateMap.add("NOT", NOTTemplate);
+      myDiagram.nodeTemplateMap.add("AND", ANDTemplate);
+      myDiagram.nodeTemplateMap.add("OR", orTemplate);
+      myDiagram.nodeTemplateMap.add("NAND", nandTemplate);
+      myDiagram.nodeTemplateMap.add("NOR", norTemplate);
+		myDiagram.nodeTemplateMap.add("XOR", xorTemplate);
+			myDiagram.nodeTemplateMap.add("XNOR", xnorTemplate);
+			myDiagram.nodeTemplateMap.add("Buzzer", BuzzerTemplate);
+			myDiagram.nodeTemplateMap.add("Relay", RelayTemplate);
+			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
 
       palette.model.nodeDataArray = [
-        { category: "input" },
-		{ category: "heat" },
-		{ category: "rgclamp" },
-        { category: "not" },
-        { category: "and" },
-        { category: "or" },
-        { category: "xor" },
-        { category: "nand" },
-       { category: "nor" },
-        { category: "xnor" },
-				{ category: "buzzer" },
-				{ category: "relay" },
-		{ category: "output" },
+        { category: "Switch" },
+		{ category: "Heat_Sensor" },
+		{ category: "Light_Sensor" },
+        { category: "NOT" },
+        { category: "AND" },
+        { category: "OR" },
+        { category: "NAND" },
+		{ category: "NOR" },
+		{ category: "XOR" },
+    	{ category: "XNOR" },
+		{ category: "Buzzer" },
+		{ category: "Relay" },
+		{ category: "Lamp" },
       ];
 
       // load the initial diagram
@@ -314,32 +314,32 @@
       myDiagram.skipsUndoManager = true;
       // do all "input" nodes first
       myDiagram.nodes.each(function(node) {
-          if (node.category === "input") {
+          if (node.category === "Switch") {
             doInput(node);
           }
-		            if (node.category === "heat") {
+		            if (node.category === "Heat_Sensor") {
             doInput(node);
           }
-		  		    if (node.category === "rgclamp") {
+		  		    if (node.category === "Light_Sensor") {
             doInput(node);
           }
         });
       // now we can do all other kinds of nodes
       myDiagram.nodes.each(function(node) {
           switch (node.category) {
-            case "and":       doAnd(node); break;
-            case "or":         doOr(node); break;
-            case "xor":       doXor(node); break;
-            case "not":       doNot(node); break;
-            case "nand":     doNand(node); break;
-            case "nor":       doNor(node); break;
-            case "xnor":     doXnor(node); break;
-            			case "buzzer": doOutput(node); break;
-			            case "relay": doOutput(node); break;
-            case "output": doOutput(node); break;
-            case "heat": break;
-			case "rgclamp": break;
-			case "input": break;  // doInput already called, above
+            case "AND":       doAnd(node); break;
+            case "OR":         doOr(node); break;
+            case "XOR":       doXor(node); break;
+            case "NOT":       doNot(node); break;
+            case "NAND":     doNand(node); break;
+            case "NOR":       doNor(node); break;
+            case "XNOR":     doXnor(node); break;
+            			case "Buzzer": doOutput(node); break;
+			            case "Relay": doOutput(node); break;
+            case "Lamp": doOutput(node); break;
+            case "Heat_Sensor": break;
+			case "Light_Sensor": break;
+			case "Switch": break;  // doInput already called, above
           }
         });
       myDiagram.skipsUndoManager = oldskip;
@@ -450,30 +450,27 @@
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [
-{"category":"input", "key":"input1", "loc":"-280 -230" },
-{"category":"rgclamp", "key":"rgclamp1", "loc":"-300 -120" },
-{"category":"heat", "key":"heat1", "loc":"-320 -20" },
-{"category":"input", "key":"input2", "loc":"-280 80" },
+{"category":"Switch", "key":"Switch1", "loc":"-280 -230" },
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120" },
+{"category":"Heat_Sensor", "key":"Heat_Sensor1", "loc":"-320 -20" },
+{"category":"Switch", "key":"Switch2", "loc":"-280 80" },
 
-{"category":"not", "key":"not1", "loc":"-60 -180" },
-{"category":"and", "key":"and1", "loc":"-40 -80" },
-{"category":"or", "key":"or1", "loc":"-40 40" },
+{"category":"NOT", "key":"NOT1", "loc":"-60 -180" },
+{"category":"AND", "key":"AND1", "loc":"-40 -80" },
+{"category":"OR", "key":"OR1", "loc":"-40 40" },
 
-{"category":"buzzer", "key":"buzzer1", "loc":"220 -180" },
-{"category":"relay", "key":"relay1", "loc":"220 -80" },
-{"category":"output", "key":"output1", "loc":"220 25" }
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -180" },
+{"category":"Relay", "key":"Relay1", "loc":"220 -80" },
+{"category":"Lamp", "key":"Lamp1", "loc":"220 25" }
  ],
  "linkDataArray": [
-{"from":"input1", "fromPort":"out", "to":"or1", "toPort":"in1"},
-{"from":"or1", "fromPort":"out", "to":"not1", "toPort":"in"},
-{"from":"and1", "fromPort":"out", "to":"and1", "toPort":"in2"},
-{"from":"not1", "fromPort":"out", "to":"xor1", "toPort":"in1"},
-{"from":"xor1", "fromPort":"out", "to":"or2", "toPort":"in1"},
-{"from":"or2", "fromPort":"out", "to":"xor1", "toPort":"in2"},
-{"from":"xor1", "fromPort":"out", "to":"output1", "toPort":""}
+{"from":"OR1", "fromPort":"out", "to":"OR1", "toPort":"in1"}
+
  ]}
+ 
     </textarea>
   </div>
+
 </div>
 </body>
 </html>
