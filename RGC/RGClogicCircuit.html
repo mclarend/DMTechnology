@@ -121,23 +121,23 @@
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/lightoutput.png",
-              { width: 60, height: 60 }),
+						$(go.Picture, "../assets/lightoutput.png",
+              { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
-      var BuzzerTemplate =
+      var buzzerTemplate =
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/buzzer.png",
-              { width: 60, height: 60 }),
+						$(go.Picture, "../assets/buzzer.png",
+              { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
 
 
-      var RelayTemplate =
+      var relayTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
@@ -274,8 +274,8 @@
       myDiagram.nodeTemplateMap.add("NOR", norTemplate);
 		myDiagram.nodeTemplateMap.add("XOR", xorTemplate);
 			myDiagram.nodeTemplateMap.add("XNOR", xnorTemplate);
-			myDiagram.nodeTemplateMap.add("Buzzer", BuzzerTemplate);
-			myDiagram.nodeTemplateMap.add("Relay", RelayTemplate);
+			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
+			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
