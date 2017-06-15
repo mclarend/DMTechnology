@@ -11,8 +11,8 @@
   <script id="code">
   
 
-    var green = "forestgreen";  // 0 or false
-    var red = "red";  // 1 or true
+    var red = "forestgreen";  // 0 or false
+    var green = "red";  // 1 or true
 
     function init() {
       if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
@@ -306,8 +306,8 @@
       myDiagram.nodeTemplateMap.add("OR", orTemplate);
       myDiagram.nodeTemplateMap.add("NAND", nandTemplate);
       myDiagram.nodeTemplateMap.add("NOR", norTemplate);
-		myDiagram.nodeTemplateMap.add("XOR", xorTemplate);
-			myDiagram.nodeTemplateMap.add("XNOR", xnorTemplate);
+		myDiagram.nodeTemplateMap.add("XNOR", xorTemplate);
+			myDiagram.nodeTemplateMap.add("XOR", xnorTemplate);
 			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
 			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
@@ -468,8 +468,7 @@
 </style>
 </head>
 <body onload="init()">
-<h1 align="center">
-  RGC Technology
+<h1 align="center"><img src="../assets/Green.png" width="50" height="50">&nbsp;Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;RGC Technology&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  <img src="../assets/Red.png" width="50" height="50">&nbsp;Red is HIGH, ON, Logic 1.
 </h1>
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
@@ -480,22 +479,17 @@
       <div id="myDiagramDiv" style="border: solid 1px black; height: 580px"></div>
     </span>
   </div>
-  <p>
-    The Logic Circuit allows the user to make circuits using inputs, logic gates, outputs and wires,
-    which are updated whenever a Link is modified.
-  </p>
-  <p>To delete a component select and press delete (desktop), select and long press then delete.
-  </p>
+  <p> The Logic Circuit allows the user to make circuits using inputs (circles), logic gates, outputs (squares) and wires,
+    which are updated whenever a Link is modified. </p>
+  <p>To delete a component select and press delete (desktop), select and long press then delete (iPad). </p>
   <p>
     The color of the Inputs (Circles),links and Outputs (Squares) determine the Logic state:
-  <span class="textgreen"><strong>Green</strong></span> means <span class="textgreen"><strong>Logic 1</strong></span>; <span class="textred"><strong>Red</strong></span> means <span class="textred"><strong>Logic 0</strong></span>. Double-clicking an input node will toggle <span class="textgreen"><strong>Logic 1</strong></span>/<span class="textred"><strong>Logic 0</strong></span>. </p>
-  <p>
-    Single Click or Mouse over a component will display the components name.
+  <span class="textgreen"><strong>Green</strong></span> means <span class="textgreen"><strong>Logic 0</strong></span>; <span class="textred"><strong>Red</strong></span> means <span class="textred"><strong>Logic 1</strong></span>. Double-clicking an input node will toggle <span class="textgreen"><strong>Logic 0</strong></span>/<span class="textred"><strong>Logic 1</strong></span>. </p>
+  <p> Single Click or Mouse over a component will display the components name.
     
     A <a>Palette</a> to the left of the main diagram allows the user to drag and drop new components.
     These components can then be linked using their input/output ports.
-    Each input port can only have one input link, while output ports can have many output links.
-  </p>
+    Each input port can only have one input link, while output ports can have many output links. Components cannot link to themselves, to facilitate a LATCH, a Connector (black square) has been added to the initial circuit so that it can be created.</p>
   <div>
     <div>
       
