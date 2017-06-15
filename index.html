@@ -1,165 +1,527 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>DM Technology</title>
-<style type="text/css">
-<!--
-body {
-	font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
-	background: #42413C;
-	margin: 0;
-	padding: 0;
-	color: #000;
-}
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RGC MFA Board</title>
+<meta name="description" content="A simple logic circuit editor and simulator." />
+  <!-- Copyright 1998-2017 by Northwoods Software Corporation. -->
+  <meta charset="UTF-8">
+  <script src="../release/go.js"></script>
+    <script src="../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->
+  <script id="code">
+  
 
-/* ~~ Element/tag selectors ~~ */
-ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
-	padding: 0;
-	margin: 0;
-}
-h1, h2, h3, h4, h5, h6, p {
-	margin-top: 0;	 /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
-	padding-right: 15px;
-	padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
-}
-a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
-	border: none;
-}
+    var red = "forestgreen";  // 0 or false
+    var green = "red";  // 1 or true
 
-/* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
-a:link {
-	color: #42413C;
-	text-decoration: underline; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
-}
-a:visited {
-	color: #6E6C64;
-	text-decoration: underline;
-}
-a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
-	text-decoration: none;
-}
+    function init() {
+      if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+      var $ = go.GraphObject.make;  // for conciseness in defining templates
 
-/* ~~this fixed width container surrounds the other divs~~ */
-.container {
-	width: 960px;
-	background: #FFF;
-	margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout */
-}
+      myDiagram =
+        $(go.Diagram, "myDiagramDiv",  // create a new Diagram in the HTML DIV element "myDiagramDiv"
+          {
+            initialContentAlignment: go.Spot.Center,
+            allowDrop: true,  // Nodes from the Palette can be dropped into the Diagram
+            "draggingTool.isGridSnapEnabled": true,  // dragged nodes will snap to a grid of 10x10 cells
+            "undoManager.isEnabled": true
+          });
 
-/* ~~ the header is not given a width. It will extend the full width of your layout. It contains an image placeholder that should be replaced with your own linked logo ~~ */
-.header {
-	background: #ADB96E;
-}
+      // when the document is modified, add a "*" to the title and enable the "Save" button
+      myDiagram.addDiagramListener("Modified", function(e) {
+        var button = document.getElementById("saveModel");
+        if (button) button.disabled = !myDiagram.isModified;
+        var idx = document.title.indexOf("*");
+        if (myDiagram.isModified) {
+          if (idx < 0) document.title += "*";
+        } else {
+          if (idx >= 0) document.title = document.title.substr(0, idx);
+        }
+      });
 
-/* ~~ These are the columns for the layout. ~~ 
+      var palette = new go.Palette("palette");  // create a new Palette in the HTML DIV element "palette"
 
-1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+      // creates relinkable Links that will avoid crossing Nodes when possible and will jump over other Links in their paths
+      myDiagram.linkTemplate =
+        $(go.Link,
+          {
+            routing: go.Link.AvoidsNodes,
+            curve: go.Link.JumpOver,
+            corner: 7,
+            relinkableFrom: true, relinkableTo: true,
+            selectionAdorned: false, // Links are NOT adorned when selected so that their color remains visible.
+            shadowOffset: new go.Point(0, 0), shadowBlur: 10, shadowColor: "blue",
+          },
+          new go.Binding("isShadowed", "isSelected").ofObject(),
+          $(go.Shape,
+            { name: "SHAPE", strokeWidth: 4, stroke: red }));
 
-2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
+      // node template helpers
+      var sharedToolTip =
+        $(go.Adornment, "Auto",
+          $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
+          $(go.TextBlock, { margin: 2 },
+            new go.Binding("text",  "" , function(d) { return d.category; })));
 
-3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
+      // define some common property settings
+      function nodeStyle() {
+        return [new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+                new go.Binding("isShadowed", "isSelected").ofObject(),
+                {
+                  selectionAdorned: false,
+                  shadowOffset: new go.Point(0, 0),
+                  shadowBlur: 15,
+                  shadowColor: "blue",
+                  toolTip: sharedToolTip
+                }];
+      }
 
-4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
+      function shapeStyle() {
+        return {
+          name: "NODESHAPE",
+          fill: "lightgray",
+          stroke: "darkslategray",
+          desiredSize: new go.Size(70, 70),
+          strokeWidth: 2
+        };
+      }
+	        function shapeStyle1() {
+        return {
+          name: "NODESHAPE",
+          fill: "lightgray",
+          stroke: "darkslategray",
+          desiredSize: new go.Size(0, 0),
+          strokeWidth: 2
+        };
 
-*/
-.sidebar1 {
-	float: left;
-	width: 180px;
-	background: #EADCAE;
-	padding-bottom: 10px;
-}
-.content {
+      }
 
-	padding: 10px 0;
-	width: 780px;
-	float: left;
-}
+      function portStyle(input) {
+        return {
+          desiredSize: new go.Size(20, 20),
+          fill: "black",
+          fromSpot: go.Spot.Right,
+          fromLinkable: !input,
+          toSpot: go.Spot.Left,
+          toLinkable: input,
+          toMaxLinks: 1,
+          cursor: "pointer"
+        };
+      }
+	  
+      function portStyle1(input) {
+        return {
+          desiredSize: new go.Size(10, 20),
+          fill: "black",
+          fromSpot: go.Spot.Right,
+          fromLinkable: input,
+          toSpot: go.Spot.Left,
+          toLinkable: !input,
+          toMaxLinks: 1,
+          cursor: "pointer"
+        };
+		
+      }
+      // define templates for each type of node
+      var SwitchTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/switch.png",
+              { width: 50, height: 50 }),
+          $(go.Shape, "Rectangle", portStyle(false),  // the only port
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+          }
+        );
+      var LampTemplate =
+		$(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, "../assets/lightoutput.png",
+              { width: 50, height: 50 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
+      var buzzerTemplate =
+		$(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, "../assets/buzzer.png",
+              { width: 50, height: 50 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
 
-/* ~~ This grouped selector gives the lists in the .content area space ~~ */
-.content ul, .content ol { 
-	padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
-}
 
-/* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
-ul.nav {
-	list-style: none; /* this removes the list marker */
-	border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
-	margin-bottom: 15px; /* this creates the space between the navigation on the content below */
-}
-ul.nav li {
-	border-bottom: 1px solid #666; /* this creates the button separation */
-}
-ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
-	padding: 5px 5px 5px 15px;
-	display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
-	width: 160px;  /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
-	text-decoration: none;
-	background: #C6D580;
-}
-ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background and text color for both mouse and keyboard navigators */
-	background: #ADB96E;
-	color: #FFF;
-}
+      var relayTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+			$(go.Picture, "../assets/relay.png",
+              { width: 60, height: 60 }),
+		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
+            { portId: "", alignment: new go.Spot(0, 0.5) })
+        );
 
-/* ~~ The footer ~~ */
-.footer {
-	padding: 10px 0;
-	background: #CCC49F;
-	position: relative;/* this gives IE6 hasLayout to properly clear */
-	clear: both; /* this clear property forces the .container to understand where the columns end and contain them */
-}
+      var AndTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "AndGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
 
-/* ~~ miscellaneous float/clear classes ~~ */
-.fltrt {  /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
-	float: right;
-	margin-left: 8px;
-}
-.fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
-	float: left;
-	margin-right: 8px;
-}
-.clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the #footer is removed or taken out of the #container */
-	clear:both;
-	height:0;
-	font-size: 1px;
-	line-height: 0px;
-}
--->
-</style></head>
+      var orTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "OrGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0.16, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle1(true),
+            { portId: "out", alignment: new go.Spot(1, 0.5) })
+        );
 
-<body>
+      var xnorTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "XorGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0.06, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
 
-<div class="container">
-  <div class="header">
-    <h1 align="center"><a href="#" title="DM Technology" target="_blank">DM Technology</a><a href="#"><img src="" alt="Insert Logo Here" name="Insert_logo" width="180" height="90" align="top" id="Insert_logo" style="background: #C6D580; display:block;" /></a></h1> 
+            var norTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "NorGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0.16, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
+
+      var xorTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "XnorGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0.06, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
+
+      var nandTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "NandGate", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
+
+      var NOTTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Inverter", shapeStyle()),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in", alignment: new go.Spot(0, 0.5) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", alignment: new go.Spot(1.1, 0.5) })
+        );
+
+      var Heat_SensorTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/hot.png",
+              { width: 30, height: 45 }),
+          $(go.Shape, "Rectangle", portStyle(false),  // the only port
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+          }
+		  );
+		  
+		var ConnectorTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "LineH", shapeStyle1()),
+          $(go.Shape, "Rectangle", portStyle1(false),
+            { portId: "in", alignment: new go.Spot(-5, 0.5) }),
+          $(go.Shape, "Rectangle", portStyle1(true),
+            { portId: "out", alignment: new go.Spot(-5, 0.5) })
+        );
+
+				  
+		        var Light_SensorTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.Picture, "../assets/lighton.png",
+              { width: 40, height: 45 }),
+          $(go.Shape, "Rectangle", portStyle(false),  // the only port
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+          }
+        );
+
+
+      // add the templates created above to myDiagram and palette
+      myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
+	  	        myDiagram.nodeTemplateMap.add("Heat_Sensor", Heat_SensorTemplate);
+	        myDiagram.nodeTemplateMap.add("Light_Sensor", Light_SensorTemplate);
+      myDiagram.nodeTemplateMap.add("NOT", NOTTemplate);
+      myDiagram.nodeTemplateMap.add("AND", AndTemplate);
+      myDiagram.nodeTemplateMap.add("OR", orTemplate);
+      myDiagram.nodeTemplateMap.add("NAND", nandTemplate);
+      myDiagram.nodeTemplateMap.add("NOR", norTemplate);
+		myDiagram.nodeTemplateMap.add("XNOR", xorTemplate);
+			myDiagram.nodeTemplateMap.add("XOR", xnorTemplate);
+			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
+			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
+			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
+						myDiagram.nodeTemplateMap.add("Connector", ConnectorTemplate);
+      // share the template map with the Palette
+      palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
+
+      palette.model.nodeDataArray = [
+        { category: "Switch" },
+		{ category: "Heat_Sensor" },
+		{ category: "Light_Sensor" },
+        { category: "NOT" },
+        { category: "AND" },
+        { category: "OR" },
+        { category: "NAND" },
+		{ category: "NOR" },
+		{ category: "XOR" },
+    	{ category: "XNOR" },
+		{ category: "Buzzer" },
+		{ category: "Relay" },
+		{ category: "Lamp" },
+				{ category: "Connector" },
+      ];
+
+ 
+      // load the initial diagram
+      load();
+
+      // continually update the diagram
+      loop();
+    }
+
+    // update the diagram every 250 milliseconds
+    function loop() {
+      setTimeout(function() { updateStates(); loop(); }, 350);
+    }
+
+    // update the value and appearance of each node according to its type and input values
+    function updateStates() {
+      var oldskip = myDiagram.skipsUndoManager;
+      myDiagram.skipsUndoManager = true;
+      // do all "input" nodes first
+      myDiagram.nodes.each(function(node) {
+          if (node.category === "Switch") {
+            doInput(node);
+          }
+		            if (node.category === "Heat_Sensor") {
+            doInput(node);
+          }
+		  		    if (node.category === "Light_Sensor") {
+            doInput(node);
+          }
+        });
+      // now we can do all other kinds of nodes
+      myDiagram.nodes.each(function(node) {
+          switch (node.category) {
+            case "AND":       doAnd(node); break;
+            case "OR":         doOr(node); break;
+            case "XOR":       doXor(node); break;
+            case "NOT":       doNot(node); break;
+            case "NAND":     doNand(node); break;
+            case "NOR":       doNor(node); break;
+            case "XNOR":     doXnor(node); break;
+            			case "Buzzer": doOutput(node); break;
+			            case "Relay": doOutput(node); break;
+            case "Lamp": doOutput(node); break;
+            case "Heat_Sensor": break;
+			case "Light_Sensor": break;
+			case "Switch": break;
+						case "Connector":	doConnector(node); break;  // doInput already called, above
+          }
+        });
+      myDiagram.skipsUndoManager = oldskip;
+    }
+
+    // helper predicate
+    function linkIsTrue(link) {  // assume the given Link has a Shape named "SHAPE"
+      return link.findObject("SHAPE").stroke === green;
+    }
+
+    // helper function for propagating results
+    function setOutputLinks(node, color) {
+      node.findLinksOutOf().each(function(link) { link.findObject("SHAPE").stroke = color; });
+    }
+
+    // update nodes by the specific function for its type
+    // determine the color of links coming out of this node based on those coming in and node type
+ function doInput(node) {
+      // the output is just the node's Shape.fill
+      setOutputLinks(node, node.findObject("NODESHAPE").fill);
+    }
+
     
-    <!-- end .header --></div>
-  <div class="sidebar1">
-    <ul class="nav">
-      <li><a href="RGC/RGClogicCircuit.html">MFA Board</a></li>
-      <li><a href="galleries/tec14.html">Image Galleries</a></li>
-      <li><a href="Eng/Components1/colourCode.html">Colour Code</a></li>
-      <li><a href="#">Link four</a></li>
-    </ul>
-    <p> The above links demonstrate a basic navigational structure using an unordered list styled with CSS. Use this as a starting point and modify the properties to produce your own unique look. If you require flyout menus, create your own using a Spry menu, a menu widget from Adobe's Exchange or a variety of other javascript or CSS solutions.</p>
-    <p>If you would like the navigation along the top, simply move the ul.nav to the top of the page and recreate the styling.</p>
-    <!-- end .sidebar1 --></div>
-  <div class="content">
-    <h1>Instructions</h1>
-    <p>Be aware that the CSS for these layouts is heavily commented. If you do most of your work in Design view, have a peek at the code to get tips on working with the CSS for the fixed layouts. You can remove these comments before you launch your site. To learn more about the techniques used in these CSS Layouts, read this article at Adobe's Developer Center - <a href="http://www.adobe.com/go/adc_css_layouts">http://www.adobe.com/go/adc_css_layouts</a>.</p>
-    <h2>Clearing Method</h2>
-    <p>Because all the columns are floated, this layout uses a clear:both declaration in the .footer rule.  This clearing technique forces the .container to understand where the columns end in order to show any borders or background colors you place on the .container. If your design requires you to remove the .footer from the .container, you'll need to use a different clearing method. The most reliable will be to add a &lt;br class=&quot;clearfloat&quot; /&gt; or &lt;div  class=&quot;clearfloat&quot;&gt;&lt;/div&gt; after your final floated column (but before the .container closes). This will have the same clearing effect.</p>
-    <h3>Logo Replacement</h3>
-    <p>An image placeholder was used in this layout in the .header where you'll likely want to place  a logo. It is recommended that you remove the placeholder and replace it with your own linked logo. </p>
-    <p> Be aware that if you use the Property inspector to navigate to your logo image using the SRC field (instead of removing and replacing the placeholder), you should remove the inline background and display properties. These inline styles are only used to make the logo placeholder show up in browsers for demonstration purposes. </p>
-    <p>To remove the inline styles, make sure your CSS Styles panel is set to Current. Select the image, and in the Properties pane of the CSS Styles panel, right click and delete the display and background properties. (Of course, you can always go directly into the code and delete the inline styles from the image or placeholder there.)</p>
-    <h4>Backgrounds</h4>
-    <p>By nature, the background color on any div will only show for the length of the content. This means if you're using a background color or border to create the look of a side column, it won't extend all the way to the footer but will stop when the content ends. If the .content div will always contain more content, you can place a border on the .content div to divide it from the column.</p>
-    <!-- end .content --></div>
-  <div class="footer">
-    <p>This .footer contains the declaration position:relative; to give Internet Explorer 6 hasLayout for the .footer and cause it to clear correctly. If you're not required to support IE6, you may remove it.</p>
-    <!-- end .footer --></div>
-  <!-- end .container --></div>
+    function doAnd(node) {
+      var color = node.findLinksInto().all(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+    function doNand(node) {
+      var color = !node.findLinksInto().all(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+	}
+	
+    function doNot(node) {
+      var color = !node.findLinksInto().all(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+    function doConnector(node) {
+      var color = !!node.findLinksInto().all(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+    
+    function doOr(node) {
+      var color = node.findLinksInto().any(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+    function doNor(node) {
+      var color = !node.findLinksInto().any(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+
+    function doXor(node) {
+      var truecount = 0;
+      node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
+      var color = truecount % 2 === 0 ? green : red;
+      setOutputLinks(node, color);
+    }
+    function doXnor(node) {
+      var truecount = 0;
+      node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
+      var color = truecount % 2 !== 0 ? green : red;
+      setOutputLinks(node, color);
+    }
+   
+
+	function doOutput(node) {
+      // assume there is just one input link
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
+	  });
+    }
+      
+    // save a model to and load a model from JSON text, displayed below the Diagram
+    function save() {
+      document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+      myDiagram.isModified = false;
+    }
+    function load() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+    }
+  </script>
+<style type="text/css">
+.textgreen {
+	color: #008000;
+}
+.textred {
+	color: #F00;
+}
+</style>
+</head>
+<body onload="init()">
+<h2 align="center"><img src="../assets/Green.png" width="50" height="50"> Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; RGC Technology &nbsp; &nbsp; &nbsp; &nbsp;  <img src="../assets/Red.png" width="50" height="50"> Red is HIGH, ON, Logic 1.
+</h2>
+<div id="sample">
+  <div style="width:100%; white-space:nowrap;">
+    <span style="display: inline-block; vertical-align: top; width:230px">
+      <div id="palette" style="border: solid 1px black; height: 580px"></div>
+    </span>
+    <span style="display: inline-block; vertical-align: top; width: 85%">
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 580px"></div>
+    </span>
+  </div>
+  <p> The Logic Circuit allows the user to make circuits using inputs (circles), logic gates, outputs (squares) and wires,
+    which are updated whenever a Link is modified. </p>
+  <p>To delete a component select and press delete (desktop), select and long press then delete (iPad). </p>
+  <p>
+    The color of the Inputs (Circles),links and Outputs (Squares) determine the Logic state:
+  <span class="textgreen"><strong>Green</strong></span> means <span class="textgreen"><strong>Logic 0</strong></span>; <span class="textred"><strong>Red</strong></span> means <span class="textred"><strong>Logic 1</strong></span>. Double-clicking an input component will toggle <span class="textgreen"><strong>Logic 0</strong></span>/<span class="textred"><strong>Logic 1</strong></span>. </p>
+  <p> Single Click or Mouse over a component will display the components name.
+    
+    A <a>Palette</a> to the left of the main diagram allows the user to drag and drop new components.
+    These components can then be linked using their input/output ports.
+    Each input port can only have one input link, while output ports can have many output links. Components cannot link to themselves, to facilitate a LATCH, a Connector (black square) has been added to the initial circuit so that it can be created.</p>
+  <div>
+    <div>
+      
+    </div>
+    <textarea id="mySavedModel" style="width:100%;height:0px">
+
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [
+{"category":"Switch", "key":"Switch1", "loc":"-280 -230" },
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120" },
+{"category":"Heat_Sensor", "key":"Heat_Sensor1", "loc":"-320 -20" },
+{"category":"Switch", "key":"Switch2", "loc":"-280 80" },
+
+{"category":"NOT", "key":"NOT1", "loc":"-90 -230" },
+{"category":"AND", "key":"AND1", "loc":"-70 -120" },
+{"category":"OR", "key":"OR1", "loc":"-40 60" },
+{"category":"Connector", "key":"Connector1", "loc":"42 86" },
+
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -180" },
+{"category":"Relay", "key":"Relay1", "loc":"220 -80" },
+{"category":"Lamp", "key":"Lamp1", "loc":"220 25" }
+ ],
+ "linkDataArray": [
+{"from":"OR1", "fromPort":"out", "to":"Connector1", "toPort":"in"}
+
+ ]}
+ 
+    </textarea>
+  </div>
+
+</div>
 </body>
 </html>
