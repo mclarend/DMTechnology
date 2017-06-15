@@ -6,8 +6,8 @@
 <meta name="description" content="A simple logic circuit editor and simulator." />
   <!-- Copyright 1998-2017 by Northwoods Software Corporation. -->
   <meta charset="UTF-8">
-  <script src="../release/go.js"></script>
-    <script src="../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->
+  <script src="release/go.js"></script>
+    <script src="assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->
   <script id="code">
   
 
@@ -127,7 +127,7 @@
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "../assets/switch.png",
+						$(go.Picture, "assets/switch.png",
               { width: 50, height: 50 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
@@ -145,7 +145,7 @@
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-						$(go.Picture, "../assets/lightoutput.png",
+						$(go.Picture, "assets/lightoutput.png",
               { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
@@ -154,7 +154,7 @@
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-						$(go.Picture, "../assets/buzzer.png",
+						$(go.Picture, "assets/buzzer.png",
               { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
@@ -165,7 +165,7 @@
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "../assets/relay.png",
+			$(go.Picture, "assets/relay.png",
               { width: 60, height: 60 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
@@ -250,7 +250,7 @@
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "../assets/hot.png",
+						$(go.Picture, "assets/hot.png",
               { width: 30, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
@@ -280,7 +280,7 @@
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "../assets/lighton.png",
+						$(go.Picture, "assets/lighton.png",
               { width: 40, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
@@ -468,7 +468,7 @@
 </style>
 </head>
 <body onload="init()">
-<h2 align="center"><img src="../assets/Green.png" width="50" height="50"> Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; RGC Technology &nbsp; &nbsp; &nbsp; &nbsp;  <img src="../assets/Red.png" width="50" height="50"> Red is HIGH, ON, Logic 1.
+<h2 align="center"><img src="assets/Green.png" width="50" height="50"> Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; RGC Technology &nbsp; &nbsp; &nbsp; &nbsp;  <img src="assets/Red.png" width="50" height="50"> Red is HIGH, ON, Logic 1.
 </h2>
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
