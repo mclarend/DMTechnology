@@ -7,17 +7,17 @@
   <!-- Copyright 1998-2017 by Northwoods Software Corporation. -->
   <meta charset="UTF-8">
   <script src="release/go.js"></script>
-    <script src="assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->
+ <!--   <script src="../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->-->
   <script id="code">
   
-
     var red = "forestgreen";  // 0 or false
     var green = "red";  // 1 or true
-
+	var fanOn = "./assets/fan.gif"
+		var fanOff = "./assets/fan.png"
+		
     function init() {
       if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
       var $ = go.GraphObject.make;  // for conciseness in defining templates
-
       myDiagram =
         $(go.Diagram, "myDiagramDiv",  // create a new Diagram in the HTML DIV element "myDiagramDiv"
           {
@@ -26,7 +26,6 @@
             "draggingTool.isGridSnapEnabled": true,  // dragged nodes will snap to a grid of 10x10 cells
             "undoManager.isEnabled": true
           });
-
       // when the document is modified, add a "*" to the title and enable the "Save" button
       myDiagram.addDiagramListener("Modified", function(e) {
         var button = document.getElementById("saveModel");
@@ -38,9 +37,7 @@
           if (idx >= 0) document.title = document.title.substr(0, idx);
         }
       });
-
       var palette = new go.Palette("palette");  // create a new Palette in the HTML DIV element "palette"
-
       // creates relinkable Links that will avoid crossing Nodes when possible and will jump over other Links in their paths
       myDiagram.linkTemplate =
         $(go.Link,
@@ -54,15 +51,13 @@
           },
           new go.Binding("isShadowed", "isSelected").ofObject(),
           $(go.Shape,
-            { name: "SHAPE", strokeWidth: 4, stroke: red }));
-
+            { name: "SHAPE", strokeWidth: 4, stroke: green }));
       // node template helpers
       var sharedToolTip =
         $(go.Adornment, "Auto",
           $(go.Shape, "RoundedRectangle", { fill: "lightyellow" }),
           $(go.TextBlock, { margin: 2 },
             new go.Binding("text",  "" , function(d) { return d.category; })));
-
       // define some common property settings
       function nodeStyle() {
         return [new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
@@ -75,7 +70,6 @@
                   toolTip: sharedToolTip
                 }];
       }
-
       function shapeStyle() {
         return {
           name: "NODESHAPE",
@@ -93,9 +87,7 @@
           desiredSize: new go.Size(0, 0),
           strokeWidth: 2
         };
-
       }
-
       function portStyle(input) {
         return {
           desiredSize: new go.Size(20, 20),
@@ -127,7 +119,7 @@
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "assets/switch.png",
+						$(go.Picture, "./assets/switch.png",
               { width: 50, height: 50 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
@@ -145,7 +137,7 @@
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-						$(go.Picture, "assets/lightoutput.png",
+						$(go.Picture, "./assets/lightoutput.png",
               { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
@@ -154,23 +146,25 @@
 		$(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-						$(go.Picture, "assets/buzzer.png",
+						$(go.Picture, "./assets/buzzer.png",
               { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
             { portId: "", alignment: new go.Spot(0, 0.5) })
         );
-
-
       var relayTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-			$(go.Picture, "assets/relay.png",
-              { width: 60, height: 60 }),
+						$(go.Picture, "./assets/relay.png",
+              { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyle(true),  // the only port
-            { portId: "", alignment: new go.Spot(0, 0.5) })
+            { portId: "in1", alignment: new go.Spot(0, 0.5) }),
+		$(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out1", alignment: new go.Spot(1.1, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out2", alignment: new go.Spot(1.1, 0.7) })
         );
-
+		
       var AndTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "AndGate", shapeStyle()),
@@ -181,7 +175,6 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
       var orTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "OrGate", shapeStyle()),
@@ -189,13 +182,12 @@
             { portId: "in1", alignment: new go.Spot(0.16, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
-          $(go.Shape, "Rectangle", portStyle1(true),
+          $(go.Shape, "Rectangle", portStyle1(false),
             { portId: "out", alignment: new go.Spot(1, 0.5) })
         );
-
       var xnorTemplate =
         $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "XorGate", shapeStyle()),
+          $(go.Shape, "XnorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -203,7 +195,6 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
             var norTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "NorGate", shapeStyle()),
@@ -214,10 +205,9 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
       var xorTemplate =
         $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "XnorGate", shapeStyle()),
+          $(go.Shape, "XorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in1", alignment: new go.Spot(0.06, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
@@ -225,7 +215,6 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
       var nandTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "NandGate", shapeStyle()),
@@ -236,7 +225,6 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
       var NOTTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Inverter", shapeStyle()),
@@ -245,16 +233,14 @@
           $(go.Shape, "Rectangle", portStyle(false),
             { portId: "out", alignment: new go.Spot(1.1, 0.5) })
         );
-
       var Heat_SensorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "assets/hot.png",
+						$(go.Picture, "./assets/hot.png",
               { width: 30, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
-
           { // if double-clicked, an input node will change its value, represented by the color.
             doubleClick: function (e, obj) {
                 e.diagram.startTransaction("Toggle Input");
@@ -274,17 +260,35 @@
           $(go.Shape, "Rectangle", portStyle1(true),
             { portId: "out", alignment: new go.Spot(-5, 0.5) })
         );
-
-				  
+      var BatteryTemplate =
+		$(go.Node, "Spot", nodeStyle(),
+						$(go.Picture, "./assets/battery.png",
+              { width: 50, height: 75 }),
+		  $(go.Shape, "Rectangle", portStyle1(false),  // the only port
+            { portId: "+", alignment: new go.Spot(0.35, 0) }),
+          $(go.Shape, "Rectangle", portStyle1(true),
+            { portId: "-", alignment: new go.Spot(0.65, 0) })
+        );
+		      var FanTemplate =
+        $(go.Node, "Spot", nodeStyle(),
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, fanOff,
+              { width: 50, height: 50 }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", alignment: new go.Spot(0, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", alignment: new go.Spot(0, 0.7) })
+        );
+						  
 		        var Light_SensorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "assets/lighton.png",
+						$(go.Picture, "./assets/lighton.png",
               { width: 40, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
-
           { // if double-clicked, an input node will change its value, represented by the color.
             doubleClick: function (e, obj) {
                 e.diagram.startTransaction("Toggle Input");
@@ -295,8 +299,6 @@
               }
           }
         );
-
-
       // add the templates created above to myDiagram and palette
       myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
 	  	        myDiagram.nodeTemplateMap.add("Heat_Sensor", Heat_SensorTemplate);
@@ -312,9 +314,10 @@
 			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
 						myDiagram.nodeTemplateMap.add("Connector", ConnectorTemplate);
+						myDiagram.nodeTemplateMap.add("Battery", BatteryTemplate);
+						myDiagram.nodeTemplateMap.add("Fan", FanTemplate);
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
-
       palette.model.nodeDataArray = [
         { category: "Switch" },
 		{ category: "Heat_Sensor" },
@@ -329,22 +332,21 @@
 		{ category: "Buzzer" },
 		{ category: "Relay" },
 		{ category: "Lamp" },
+				{ category: "Battery" },
 				{ category: "Connector" },
+				{ category: "Fan" },
+				
       ];
-
  
       // load the initial diagram
       load();
-
       // continually update the diagram
       loop();
     }
-
     // update the diagram every 250 milliseconds
     function loop() {
-      setTimeout(function() { updateStates(); loop(); }, 350);
+      setTimeout(function() { updateStates(); loop(); }, 250);
     }
-
     // update the value and appearance of each node according to its type and input values
     function updateStates() {
       var oldskip = myDiagram.skipsUndoManager;
@@ -372,39 +374,40 @@
             case "NOR":       doNor(node); break;
             case "XNOR":     doXnor(node); break;
             			case "Buzzer": doOutput(node); break;
-			            case "Relay": doOutput(node); break;
+			            case "Relay": doRelay(node); break;
             case "Lamp": doOutput(node); break;
             case "Heat_Sensor": break;
 			case "Light_Sensor": break;
 			case "Switch": break;
-						case "Connector":	doConnector(node); break;  // doInput already called, above
+						case "Connector":	doConnector(node); break;
+						case "Battery":	doConnector(node); break;
+						case "Fan":	doFan(node); break;  // doInput already called, above
           }
         });
       myDiagram.skipsUndoManager = oldskip;
     }
-
     // helper predicate
     function linkIsTrue(link) {  // assume the given Link has a Shape named "SHAPE"
-      return link.findObject("SHAPE").stroke === green;
+      return link.findObject("SHAPE").stroke == green;
     }
-
     // helper function for propagating results
     function setOutputLinks(node, color) {
       node.findLinksOutOf().each(function(link) { link.findObject("SHAPE").stroke = color; });
     }
-
     // update nodes by the specific function for its type
     // determine the color of links coming out of this node based on those coming in and node type
  function doInput(node) {
       // the output is just the node's Shape.fill
       setOutputLinks(node, node.findObject("NODESHAPE").fill);
     }
-
     
     function doAnd(node) {
-      var color = node.findLinksInto().all(linkIsTrue) ? green : red;
+      var truecount = 0;
+      node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
+      var color = truecount === 2 ? green : red;
       setOutputLinks(node, color);
     }
+	
     function doNand(node) {
       var color = !node.findLinksInto().all(linkIsTrue) ? green : red;
       setOutputLinks(node, color);
@@ -415,7 +418,9 @@
       setOutputLinks(node, color);
     }
     function doConnector(node) {
-      var color = !!node.findLinksInto().all(linkIsTrue) ? green : red;
+      var truecount = 0;
+      node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
+      var color = truecount === 1 ? green : red;
       setOutputLinks(node, color);
     }
     
@@ -427,7 +432,6 @@
       var color = !node.findLinksInto().any(linkIsTrue) ? green : red;
       setOutputLinks(node, color);
     }
-
     function doXor(node) {
       var truecount = 0;
       node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
@@ -441,12 +445,28 @@
       setOutputLinks(node, color);
     }
    
-
 	function doOutput(node) {
       // assume there is just one input link
       // we just need to update the node's Shape.fill
       node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
 	  });
+    }
+		function doRelay(node) {
+      // assume there is just one input link
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
+	  });      
+	  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+    }
+			function doFan(node) {
+      // assume there is just one input link
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
+	  });      
+	  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+
     }
       
     // save a model to and load a model from JSON text, displayed below the Diagram
@@ -468,8 +488,8 @@
 </style>
 </head>
 <body onload="init()">
-<h2 align="center"><img src="assets/Green.png" width="50" height="50"> Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; RGC Technology &nbsp; &nbsp; &nbsp; &nbsp;  <img src="assets/Red.png" width="50" height="50"> Red is HIGH, ON, Logic 1.
-</h2>
+ <h1 align="center"><img src="assets/Green.png" width="50" height="50">&nbsp;Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;RGC Technology&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  <img src="assets/Red.png" width="50" height="50">&nbsp;Red is HIGH, ON, Logic 1.
+</h1> 
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; width:230px">
@@ -484,7 +504,7 @@
   <p>To delete a component select and press delete (desktop), select and long press then delete (iPad). </p>
   <p>
     The color of the Inputs (Circles),links and Outputs (Squares) determine the Logic state:
-  <span class="textgreen"><strong>Green</strong></span> means <span class="textgreen"><strong>Logic 0</strong></span>; <span class="textred"><strong>Red</strong></span> means <span class="textred"><strong>Logic 1</strong></span>. Double-clicking an input component will toggle <span class="textgreen"><strong>Logic 0</strong></span>/<span class="textred"><strong>Logic 1</strong></span>. </p>
+  <span class="textgreen"><strong>Green</strong></span> means <span class="textgreen"><strong>Logic 0</strong></span>; <span class="textred"><strong>Red</strong></span> means <span class="textred"><strong>Logic 1</strong></span>. Double-clicking an input node will toggle <span class="textgreen"><strong>Logic 0</strong></span>/<span class="textred"><strong>Logic 1</strong></span>. </p>
   <p> Single Click or Mouse over a component will display the components name.
     
     A <a>Palette</a> to the left of the main diagram allows the user to drag and drop new components.
