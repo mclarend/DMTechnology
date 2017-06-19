@@ -106,9 +106,9 @@
           desiredSize: new go.Size(10, 20),
           fill: "black",
           fromSpot: go.Spot.Right,
-          fromLinkable: input,
+          fromLinkable: !input,
           toSpot: go.Spot.Left,
-          toLinkable: !input,
+          toLinkable: input,
           toMaxLinks: 1,
           cursor: "pointer"
         };
@@ -255,9 +255,9 @@
 		var ConnectorTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "LineH", shapeStyle1()),
-          $(go.Shape, "Rectangle", portStyle1(false),
-            { portId: "in", alignment: new go.Spot(-5, 0.5) }),
           $(go.Shape, "Rectangle", portStyle1(true),
+            { portId: "in", alignment: new go.Spot(-5, 0.5) }),
+          $(go.Shape, "Rectangle", portStyle1(false),
             { portId: "out", alignment: new go.Spot(-5, 0.5) })
         );
       var BatteryTemplate =
