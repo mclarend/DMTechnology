@@ -265,9 +265,9 @@
 						$(go.Picture, "./assets/battery.png",
               { width: 50, height: 75 }),
 		  $(go.Shape, "Rectangle", portStyle1(false),  // the only port
-            { portId: "+", alignment: new go.Spot(0.35, 0) }),
+            { portId: "+", alignment: new go.Spot(0.65, 0) }),
           $(go.Shape, "Rectangle", portStyle1(true),
-            { portId: "-", alignment: new go.Spot(0.65, 0) })
+            { portId: "-", alignment: new go.Spot(0.35, 0) })
         );
 		      var FanTemplate =
         $(go.Node, "Spot", nodeStyle(),
@@ -308,8 +308,8 @@
       myDiagram.nodeTemplateMap.add("OR", orTemplate);
       myDiagram.nodeTemplateMap.add("NAND", nandTemplate);
       myDiagram.nodeTemplateMap.add("NOR", norTemplate);
-		myDiagram.nodeTemplateMap.add("XNOR", xorTemplate);
-			myDiagram.nodeTemplateMap.add("XOR", xnorTemplate);
+		myDiagram.nodeTemplateMap.add("XOR", xorTemplate);
+			myDiagram.nodeTemplateMap.add("XNOR", xnorTemplate);
 			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
 			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
@@ -368,11 +368,11 @@
           switch (node.category) {
             case "AND":       doAnd(node); break;
             case "OR":         doOr(node); break;
-            case "XOR":       doXor(node); break;
+            case "XNOR":       doXor(node); break;
             case "NOT":       doNot(node); break;
             case "NAND":     doNand(node); break;
             case "NOR":       doNor(node); break;
-            case "XNOR":     doXnor(node); break;
+            case "XOR":     doXnor(node); break;
             			case "Buzzer": doOutput(node); break;
 			            case "Relay": doRelay(node); break;
             case "Lamp": doOutput(node); break;
@@ -528,14 +528,16 @@
 {"category":"NOT", "key":"NOT1", "loc":"-90 -230" },
 {"category":"AND", "key":"AND1", "loc":"-70 -120" },
 {"category":"OR", "key":"OR1", "loc":"-40 60" },
-{"category":"Connector", "key":"Connector1", "loc":"42 86" },
+{"category":"Connector", "key":"Connector1", "loc":"-55 71" },
+{"category":"Connector", "key":"Connector2", "loc":"-55 100" },
 
 {"category":"Buzzer", "key":"Buzzer1", "loc":"220 -180" },
 {"category":"Relay", "key":"Relay1", "loc":"220 -80" },
 {"category":"Lamp", "key":"Lamp1", "loc":"220 25" }
  ],
  "linkDataArray": [
-{"from":"OR1", "fromPort":"out", "to":"Connector1", "toPort":"in"}
+{"from":"Connector1", "fromPort":"out", "to":"OR1", "toPort":"in1"},
+{"from":"Connector2", "fromPort":"out", "to":"OR1", "toPort":"in2"}
 
  ]}
  
