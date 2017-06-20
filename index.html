@@ -178,9 +178,9 @@
       var orTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "OrGate", shapeStyle()),
-          $(go.Shape, "Rectangle", portStyle(true),
+          $(go.Shape, "Rectangle", portStyle1(true),
             { portId: "in1", alignment: new go.Spot(0.16, 0.3) }),
-          $(go.Shape, "Rectangle", portStyle(true),
+          $(go.Shape, "Rectangle", portStyle1(true),
             { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
           $(go.Shape, "Rectangle", portStyle1(false),
             { portId: "out", alignment: new go.Spot(1, 0.5) })
@@ -450,6 +450,9 @@
       // we just need to update the node's Shape.fill
       node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
 	  });
+	  	  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
+      setOutputLinks(node, color);
+	  node.findObject("NODESHAPE").fill = color
     }
 		function doRelay(node) {
       // assume there is just one input link
@@ -458,6 +461,7 @@
 	  });      
 	  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
       setOutputLinks(node, color);
+	  node.findObject("NODESHAPE").fill = color;
     }
 			function doFan(node) {
       // assume there is just one input link
@@ -509,7 +513,7 @@
     
     A <a>Palette</a> to the left of the main diagram allows the user to drag and drop new components.
     These components can then be linked using their input/output ports.
-    Each input port can only have one input link, while output ports can have many output links. Components cannot link to themselves, to facilitate a LATCH, a Connector (black square) has been added to the initial circuit so that it can be created.</p>
+    Each input port can only have one input link, while output ports can have many output links. Components cannot link to themselves, to facilitate a LATCH, two Connectors (black square) have been added to the initial circuit OR gate so that a Latch can be created. If you require more you have to construct it yourself.</p>
   <div>
     <div>
       
@@ -528,8 +532,8 @@
 {"category":"NOT", "key":"NOT1", "loc":"-90 -230" },
 {"category":"AND", "key":"AND1", "loc":"-70 -120" },
 {"category":"OR", "key":"OR1", "loc":"-40 60" },
-{"category":"Connector", "key":"Connector1", "loc":"-55 71" },
-{"category":"Connector", "key":"Connector2", "loc":"-55 100" },
+{"category":"Connector", "key":"Connector1", "loc":"-48 71" },
+{"category":"Connector", "key":"Connector2", "loc":"-48 100" },
 
 {"category":"Buzzer", "key":"Buzzer1", "loc":"220 -180" },
 {"category":"Relay", "key":"Relay1", "loc":"220 -80" },
