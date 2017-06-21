@@ -39,16 +39,17 @@
       });
       var palette = new go.Palette("palette");  // create a new Palette in the HTML DIV element "palette"
       // creates relinkable Links that will avoid crossing Nodes when possible and will jump over other Links in their paths
-      myDiagram.linkTemplate =
-        $(go.Link,
-          {
-            routing: go.Link.AvoidsNodes,
-            curve: go.Link.JumpOver,
-            corner: 7,
-            relinkableFrom: true, relinkableTo: true,
-            selectionAdorned: false, // Links are NOT adorned when selected so that their color remains visible.
-            shadowOffset: new go.Point(0, 0), shadowBlur: 10, shadowColor: "blue",
-          },
+ myDiagram.linkTemplate =
+      $(go.Link,  // the whole link panel
+        { relinkableFrom: true, relinkableTo: true, reshapable: true, resegmentable: true },
+        {
+          routing: go.Link.AvoidsNodes,  // but this is changed to go.Link.Orthgonal when the Link is reshaped
+          adjusting: go.Link.End,
+          curve: go.Link.JumpOver,
+          corner: 5
+        },
+
+
           new go.Binding("isShadowed", "isSelected").ofObject(),
           $(go.Shape,
             { name: "SHAPE", strokeWidth: 4, stroke: green }));
@@ -271,7 +272,7 @@
         );
 		      var FanTemplate =
         $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "Rectangle", shapeStyle(),
+          $(go.Shape, "StopSign", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
 						$(go.Picture, fanOff,
               { width: 50, height: 50 }),
@@ -283,10 +284,8 @@
 						  
 		        var Light_SensorTemplate =
         $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "Circle", shapeStyle(),
+          $(go.Shape, "Clock", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
-						$(go.Picture, "./assets/lighton.png",
-              { width: 40, height: 45 }),
           $(go.Shape, "Rectangle", portStyle(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
           { // if double-clicked, an input node will change its value, represented by the color.
