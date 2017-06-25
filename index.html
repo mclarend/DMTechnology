@@ -6,8 +6,8 @@
 <meta name="description" content="A simple logic circuit editor and simulator." />
   <!-- Copyright 1998-2017 by Northwoods Software Corporation. -->
   <meta charset="UTF-8">
-  <script src="release/go.js"></script>
- <!--   <script src="../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->-->
+  <script src="./release/go.js"></script>
+ <!--   <script src=".../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->D McLaren
   <script id="code">
   
     var red = "forestgreen";  // 0 or false
@@ -52,7 +52,7 @@
 
           new go.Binding("isShadowed", "isSelected").ofObject(),
           $(go.Shape,
-            { name: "SHAPE", strokeWidth: 4, stroke: green }));
+            { name: "SHAPE", strokeWidth: 4, stroke: red }));
       // node template helpers
       var sharedToolTip =
         $(go.Adornment, "Auto",
@@ -179,12 +179,21 @@
       var orTemplate =
         $(go.Node, "Spot", nodeStyle(),
           $(go.Shape, "OrGate", shapeStyle()),
-          $(go.Shape, "Rectangle", portStyle1(true),
-            { portId: "in1", alignment: new go.Spot(0.16, 0.3) }),
-          $(go.Shape, "Rectangle", portStyle1(true),
-            { portId: "in2", alignment: new go.Spot(0.16, 0.7) }),
-          $(go.Shape, "Rectangle", portStyle1(false),
-            { portId: "out", alignment: new go.Spot(1, 0.5) })
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in1", cursor: "pointer",  // show a different cursor to indicate potential link point
+                  fromLinkable: false, toLinkable: true,
+                  fromLinkableDuplicates: true, toLinkableDuplicates: false,
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.16, 0.3) }),
+          $(go.Shape, "Rectangle", portStyle(true),
+            { portId: "in2", cursor: "pointer",  // show a different cursor to indicate potential link point
+                  fromLinkable: false, toLinkable: true,
+                  fromLinkableDuplicates: true, toLinkableDuplicates: false,
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.16, 0.7) }),
+          $(go.Shape, "Rectangle", portStyle(false),
+            { portId: "out", 
+                  fromLinkable: true, toLinkable: false,
+                  fromLinkableDuplicates: true, toLinkableDuplicates: true,
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(1, 0.5) })
         );
       var xnorTemplate =
         $(go.Node, "Spot", nodeStyle(),
@@ -254,12 +263,21 @@
 		  );
 		  
 		var ConnectorTemplate =
-        $(go.Node, "Spot", nodeStyle(),
-          $(go.Shape, "LineH", shapeStyle1()),
-          $(go.Shape, "Rectangle", portStyle1(true),
-            { portId: "in", alignment: new go.Spot(-5, 0.5) }),
-          $(go.Shape, "Rectangle", portStyle1(false),
-            { portId: "out", alignment: new go.Spot(-5, 0.5) })
+            $(go.Node, "Auto", nodeStyle(),
+        $(go.Shape, "Rectangle",
+          { fill: "lightyellow", stroke: null }),
+        $(go.TextBlock,
+          {
+            margin: 5,
+            maxSize: new go.Size(200, NaN),
+            wrap: go.TextBlock.WrapFit,
+            textAlign: "center",
+            editable: true,
+            font: "bold 12pt Helvetica, Arial, sans-serif",
+            stroke: '#454545'
+          },
+          new go.Binding("text").makeTwoWay())
+        // no ports, because no links are allowed to connect with a comment
         );
       var BatteryTemplate =
 		$(go.Node, "Spot", nodeStyle(),
@@ -302,17 +320,17 @@
       myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
 	  	        myDiagram.nodeTemplateMap.add("Heat_Sensor", Heat_SensorTemplate);
 	        myDiagram.nodeTemplateMap.add("Light_Sensor", Light_SensorTemplate);
-      myDiagram.nodeTemplateMap.add("NOT", NOTTemplate);
-      myDiagram.nodeTemplateMap.add("AND", AndTemplate);
-      myDiagram.nodeTemplateMap.add("OR", orTemplate);
-      myDiagram.nodeTemplateMap.add("NAND", nandTemplate);
-      myDiagram.nodeTemplateMap.add("NOR", norTemplate);
-		myDiagram.nodeTemplateMap.add("XOR", xorTemplate);
-			myDiagram.nodeTemplateMap.add("XNOR", xnorTemplate);
+      myDiagram.nodeTemplateMap.add("NOT gate", NOTTemplate);
+      myDiagram.nodeTemplateMap.add("AND gate", AndTemplate);
+      myDiagram.nodeTemplateMap.add("OR gate", orTemplate);
+      myDiagram.nodeTemplateMap.add("NAND gate", nandTemplate);
+      myDiagram.nodeTemplateMap.add("NOR gate", norTemplate);
+		myDiagram.nodeTemplateMap.add("XOR gate", xorTemplate);
+			myDiagram.nodeTemplateMap.add("XNOR gate", xnorTemplate);
 			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
 			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
-						myDiagram.nodeTemplateMap.add("Connector", ConnectorTemplate);
+						myDiagram.nodeTemplateMap.add("Label", ConnectorTemplate);
 						myDiagram.nodeTemplateMap.add("Battery", BatteryTemplate);
 						myDiagram.nodeTemplateMap.add("Fan", FanTemplate);
       // share the template map with the Palette
@@ -321,18 +339,18 @@
         { category: "Switch" },
 		{ category: "Heat_Sensor" },
 		{ category: "Light_Sensor" },
-        { category: "NOT" },
-        { category: "AND" },
-        { category: "OR" },
-        { category: "NAND" },
-		{ category: "NOR" },
-		{ category: "XOR" },
-    	{ category: "XNOR" },
+          				{ category: "Label",text: "Label Here"  },
+        { category: "NOT gate" },
+        { category: "AND gate" },
+        { category: "OR gate" },
+        { category: "NAND gate" },
+		{ category: "NOR gate" },
+		{ category: "XOR gate" },
+    	{ category: "XNOR gate" },
 		{ category: "Buzzer" },
 		{ category: "Relay" },
 		{ category: "Lamp" },
 				{ category: "Battery" },
-				{ category: "Connector" },
 				{ category: "Fan" },
 				
       ];
@@ -365,20 +383,20 @@
       // now we can do all other kinds of nodes
       myDiagram.nodes.each(function(node) {
           switch (node.category) {
-            case "AND":       doAnd(node); break;
-            case "OR":         doOr(node); break;
-            case "XNOR":       doXor(node); break;
-            case "NOT":       doNot(node); break;
-            case "NAND":     doNand(node); break;
-            case "NOR":       doNor(node); break;
-            case "XOR":     doXnor(node); break;
+            case "AND gate":       doAnd(node); break;
+            case "OR gate":         doOr(node); break;
+            case "XNOR gate":       doXor(node); break;
+            case "NOT gate":       doNot(node); break;
+            case "NAND gate":     doNand(node); break;
+            case "NOR gate":       doNor(node); break;
+            case "XOR gate":     doXnor(node); break;
             			case "Buzzer": doOutput(node); break;
 			            case "Relay": doRelay(node); break;
             case "Lamp": doOutput(node); break;
             case "Heat_Sensor": break;
 			case "Light_Sensor": break;
 			case "Switch": break;
-						case "Connector":	doConnector(node); break;
+						//case "Connector":	doConnector(node); break;
 						case "Battery":	doConnector(node); break;
 						case "Fan":	doFan(node); break;  // doInput already called, above
           }
@@ -491,7 +509,7 @@
 </style>
 </head>
 <body onload="init()">
- <h1 align="center"><img src="assets/Green.png" width="50" height="50">&nbsp;Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;RGC Technology&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  <img src="assets/Red.png" width="50" height="50">&nbsp;Red is HIGH, ON, Logic 1.
+ <h1 align="center"><img src="./assets/Green.png" width="50" height="50">&nbsp;Green is LOW, OFF, Logic 0. &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;RGC Technology&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  <img src="./assets/Red.png" width="50" height="50">&nbsp;Red is HIGH, ON, Logic 1.
 </h1> 
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
@@ -523,24 +541,30 @@
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [
-{"category":"Switch", "key":"Switch1", "loc":"-280 -230" },
+{"category":"Switch", "key":"Switch1", "loc":"-280 -235" },
 {"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120" },
 {"category":"Heat_Sensor", "key":"Heat_Sensor1", "loc":"-320 -20" },
 {"category":"Switch", "key":"Switch2", "loc":"-280 80" },
 
-{"category":"NOT", "key":"NOT1", "loc":"-90 -230" },
-{"category":"AND", "key":"AND1", "loc":"-70 -120" },
-{"category":"OR", "key":"OR1", "loc":"-40 60" },
-{"category":"Connector", "key":"Connector1", "loc":"-48 71" },
-{"category":"Connector", "key":"Connector2", "loc":"-48 100" },
+        {"category":"Label", "loc":"-345 -210", "text":"Switch"},
+        {"category":"Label", "loc":"-410 -100", "text":"Light Sensor"},
+        {"category":"Label", "loc":"-425 0", "text":"Heat Sensor"},
+        {"category":"Label", "loc":"-345 100", "text":"Switch"},
+        
+{"category":"NOT gate", "key":"NOT1", "loc":"-45 -230" },
+{"category":"AND gate", "key":"AND1", "loc":"-45 -90" },
+{"category":"OR gate", "key":"OR1", "loc":"-40 60" },
 
-{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -180" },
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -235" },
 {"category":"Relay", "key":"Relay1", "loc":"220 -80" },
-{"category":"Lamp", "key":"Lamp1", "loc":"220 25" }
+{"category":"Lamp", "key":"Lamp1", "loc":"220 80" },
+        
+                {"category":"Label", "loc":"230 -265", "text":"Buzzer"},
+        {"category":"Label", "loc":"235 -108", "text":"Relay"},
+        {"category":"Label", "loc":"235 52", "text":"Lamp"}
  ],
  "linkDataArray": [
-{"from":"Connector1", "fromPort":"out", "to":"OR1", "toPort":"in1"},
-{"from":"Connector2", "fromPort":"out", "to":"OR1", "toPort":"in2"}
+{"from":"connector2", "fromPort":"out", "to":"Or1", "toPort":"in2"}
 
  ]}
  
