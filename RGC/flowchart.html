@@ -23,7 +23,6 @@
           "animationManager.duration": 800, // slightly longer than default (600ms) animation
           "undoManager.isEnabled": true  // enable undo & redo
         });
-
     // when the document is modified, add a "*" to the title and enable the "Save" button
     myDiagram.addDiagramListener("Modified", function(e) {
       var button = document.getElementById("SaveButton");
@@ -67,7 +66,7 @@
                {
                   fill: "transparent",
                   stroke: null,  // this is changed to "white" in the showPorts function
-                  desiredSize: new go.Size(8, 8),
+                  desiredSize: new go.Size(20, 20),
                   alignment: spot, alignmentFocus: spot,  // align the port on the main Shape
                   portId: name,  // declare this object to be a "port"
                   fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
@@ -85,13 +84,13 @@
     myDiagram.nodeTemplateMap.add("",  // the default category
       $(go.Node, "Spot", nodeStyle(),
         // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
-        $(go.Panel, "Auto",
+        $(go.Panel, "Auto",{ _isLinkLabel: true },
           $(go.Shape, "Rectangle",
             { fill: "#00A9C9", stroke: "Black" },
             new go.Binding("figure", "figure")),
           $(go.TextBlock,
             {
-              font: "bold 11pt Helvetica, Arial, sans-serif",
+              font: "bold 12pt Helvetica, Arial, sans-serif",
               stroke: lightText,
               margin: 8,
               maxSize: new go.Size(160, NaN),
@@ -102,9 +101,22 @@
         ),
         // four named ports, one on each side:
         makePort("T", go.Spot.Top, false, true),
+        makePort("L", go.Spot.Left, true, true),
+        makePort("R", go.Spot.Right, true, true),
         makePort("B", go.Spot.Bottom, true, false)
       ));
-
+    
+      myDiagram.nodeTemplateMap.add("blank",  // the default category
+      $(go.Node, "Spot", nodeStyle(),
+        // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+        $(go.Panel, "Auto",
+          $(go.Shape, "Rectangle",
+            { desiredSize: new go.Size(60, 60),fill: "rgba(0, 169, 201, 0.01)", stroke: "white" },
+            new go.Binding("figure", "figure"))
+        
+        ),
+      ));
+      
     myDiagram.nodeTemplateMap.add("Start",
       $(go.Node, "Spot", nodeStyle(),
         $(go.Panel, "Auto",
@@ -150,11 +162,11 @@
         // no ports, because no links are allowed to connect with a comment
       ));
 
-    myDiagram.nodeTemplateMap.add("Decision",
+    myDiagram.nodeTemplateMap.add("General",
       $(go.Node, "Spot", nodeStyle(),
         $(go.Panel, "Auto",{ visible: true, name: "LABEL", segmentIndex: 2, segmentFraction: 0.5},
           new go.Binding("visible", "visible").makeTwoWay(),
-          $(go.Shape, "Diamond",
+          $(go.Shape, "Rectangle",
             { fill: "#00A9C9", stroke: "Black" },
             new go.Binding("figure", "figure")),
           $(go.TextBlock,
@@ -170,8 +182,6 @@
         ),
         // four named ports, one on each side:
         makePort("T", go.Spot.Top, false, true, true, false, true, true),
-                makePort("R", go.Spot.Right, true, false),
-                makePort("l", go.Spot.Left, true, false),
         makePort("B", go.Spot.Bottom, true, false, false, true, true, true),
         
       ));
@@ -249,7 +259,7 @@
           $(go.TextBlock, "Yes",  // the label
             {
               textAlign: "center",
-              font: "10pt helvetica, arial, sans-serif",
+              font: "14pt helvetica, arial, sans-serif",
               stroke: "#333333",
               editable: true
             },
@@ -277,12 +287,14 @@
           "animationManager.duration": 800, // slightly longer than default (600ms) animation
           nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
           model: new go.GraphLinksModel([  // specify the contents of the Palette
-            { category: "Start", text: "Start" },
-            { text: "General" },
-                           { category: "InputOutput", text: "InputOutput" }, 
-             { category: "Decision", text: "Decision" }, 
+                 { category: "blank", text: "" },
+              { category: "Start", text: "Start" },
+              { category: "InputOutput", text: "InputOutput" }, 
+             { category: "General", text: "General" },
+               { text: "Decision", figure: "Diamond" },             
               { category: "SubProcedure", text: "SubProcedure" },
               { category: "Stop", text: "Stop" },
+
              { category: "Comment", text: "Comment" }
           ])
         });
