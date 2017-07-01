@@ -52,15 +52,6 @@ a:hover, a:active, a:focus { /* this group of selectors will give a keyboard nav
 	background: #ADB96E;
 }
 
-/* ~~ These are the columns for the layout. ~~ 
-
-1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
-
-2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
-
-3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
-
-4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
 
 */
 .sidebar1 {
@@ -142,23 +133,24 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background
       <li><a href="Eng/Components1/colourCode.html">Colour Code</a></li>
       <li><a href="RGC/flowchart.html">Flowchart Creator</a></li>
     </ul>
-    <p> The above links demonstrate a basic navigational structure using an unordered list styled with CSS. Use this as a starting point and modify the properties to produce your own unique look. If you require flyout menus, create your own using a Spry menu, a menu widget from Adobe's Exchange or a variety of other javascript or CSS solutions.</p>
-    <p>If you would like the navigation along the top, simply move the ul.nav to the top of the page and recreate the styling.</p>
+    <p> The above links demonstrate some example web based support material and development options.</p>
+    <p>Further ideas are a System Diagram creator, Saving creations options.</p>
     <!-- end .sidebar1 --></div>
   <div class="content">
-    <h1>Instructions</h1>
-    <p>Be aware that the CSS for these layouts is heavily commented. If you do most of your work in Design view, have a peek at the code to get tips on working with the CSS for the fixed layouts. You can remove these comments before you launch your site. To learn more about the techniques used in these CSS Layouts, read this article at Adobe's Developer Center - <a href="http://www.adobe.com/go/adc_css_layouts">http://www.adobe.com/go/adc_css_layouts</a>.</p>
-    <h2>Clearing Method</h2>
-    <p>Because all the columns are floated, this layout uses a clear:both declaration in the .footer rule.  This clearing technique forces the .container to understand where the columns end in order to show any borders or background colors you place on the .container. If your design requires you to remove the .footer from the .container, you'll need to use a different clearing method. The most reliable will be to add a &lt;br class=&quot;clearfloat&quot; /&gt; or &lt;div  class=&quot;clearfloat&quot;&gt;&lt;/div&gt; after your final floated column (but before the .container closes). This will have the same clearing effect.</p>
-    <h3>Logo Replacement</h3>
-    <p>An image placeholder was used in this layout in the .header where you'll likely want to place  a logo. It is recommended that you remove the placeholder and replace it with your own linked logo. </p>
-    <p> Be aware that if you use the Property inspector to navigate to your logo image using the SRC field (instead of removing and replacing the placeholder), you should remove the inline background and display properties. These inline styles are only used to make the logo placeholder show up in browsers for demonstration purposes. </p>
-    <p>To remove the inline styles, make sure your CSS Styles panel is set to Current. Select the image, and in the Properties pane of the CSS Styles panel, right click and delete the display and background properties. (Of course, you can always go directly into the code and delete the inline styles from the image or placeholder there.)</p>
-    <h4>Backgrounds</h4>
-    <p>By nature, the background color on any div will only show for the length of the content. This means if you're using a background color or border to create the look of a side column, it won't extend all the way to the footer but will stop when the content ends. If the .content div will always contain more content, you can place a border on the .content div to divide it from the column.</p>
+    <h1>RGC Logic Circuit</h1>
+    <p>Created for our S1 Electronics course which utilises the Decisions Module from MFA. Although addition Logic gates have been added so that the Engineering Science course can also use it for revision and development of solutions. </a>.</p>
+    <p> 
+        </p>
+    <p>S1 can now revise at home, solve problems and catch up at home. This also now lends the unit for more Homework opportunities.</p>
+    <h1>Galleries</h1>
+    <p>An idea for displaying pupil's end results in the workshop.</p>
+    <h1>Colour Code</h1>
+    <p>Resistor colour codes is for N5 Engineering Science.</p>
+    <h1>Flowchart Creator</h1>
+    <p>Created for pupils to create flowcharts easily on the iPad although can be used on a Desktop machine. To save the image on an iPad, a screen shot must be used to save a photo. On a Desktop, the save image button at the bottom of the page with save and download a png file of the flowchart area.</p>
     <!-- end .content --></div>
   <div class="footer">
-    <p>This .footer contains the declaration position:relative; to give Internet Explorer 6 hasLayout for the .footer and cause it to clear correctly. If you're not required to support IE6, you may remove it.</p>
+    <p>This is just a test site to play around with. It has no affiliation to any other site, school, or anything else.</p>
     <!-- end .footer --></div>
   <!-- end .container --></div>
 </body>
