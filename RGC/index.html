@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RGC Flowchart</title>
+<meta name="description" content="Interactive flowchart diagram implemented by GoJS in JavaScript for HTML." />
+<!-- Copyright 1998-2017 by Northwoods Software Corporation. -->D McLaren
+<meta charset="UTF-8">
+<script src="../release/go.js"></script>
+
+<script id="code">
+  function init() {
+  
+    var $ = go.GraphObject.make;  // for conciseness in defining templates
+
+    myDiagram =
+      $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
+        {
+          initialContentAlignment: go.Spot.Center,
+          allowDrop: true,  // must be true to accept drops from the Palette
+          "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
+          "LinkRelinked": showLinkLabel,
+          "animationManager.duration": 600, // slightly longer than default (600ms) animation
+          "undoManager.isEnabled": true  // enable undo & redo
+        });
+      
+    // when the document is modified, add a "*" to the title and enable the "Save" button
+    myDiagram.addDiagramListener("Modified", function(e) {
+      var button = document.getElementById("SaveButton");
+      if (button) button.disabled = !myDiagram.isModified;
+      var idx = document.title.indexOf("*");
+      if (myDiagram.isModified) {
+        if (idx < 0) document.title += "*";
+      } else {
+        if (idx >= 0) document.title = document.title.substr(0, idx);
+      }
+    });
+
+      
+    // helper definitions for node templates
+
+    function nodeStyle() {
+      return [
+        // The Node.location comes from the "loc" property of the node data,
+        // converted by the Point.parse static method.
+        // If the Node.location is changed, it updates the "loc" property of the node data,
+        // converting back using the Point.stringify static method.
+        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+        {
+          // the Node.location is at the center of each node
+          locationSpot: go.Spot.Center,
+          //isShadowed: true,
+          //shadowColor: "#888",
+          // handle mouse enter/leave events to show/hide the ports
+          mouseEnter: function (e, obj) { showPorts(obj.part, true); },
+          mouseLeave: function (e, obj) { showPorts(obj.part, false); }
+        }
+      ];
+    }
+
+    // Define a function for creating a "port" that is normally transparent.
+    // The "name" is used as the GraphObject.portId, the "spot" is used to control how links connect
+    // and where the port is positioned on the node, and the boolean "output" and "input" arguments
+    // control whether the user can draw links from or to the port.
+    function makePort(name, spot, output, input) {
+      // the port is basically just a small circle that has a white stroke when it is made visible
+      return $(go.Shape, "Circle",
+               {
+                  fill: "transparent",
+                  stroke: null,  // this is changed to "white" in the showPorts function
+                  desiredSize: new go.Size(20, 20),
+                  alignment: spot, alignmentFocus: spot,  // align the port on the main Shape
+                  portId: name,  // declare this object to be a "port"
+                  fromSpot: spot, toSpot: spot,  // declare where links may connect at this port
+                  fromLinkable: output, toLinkable: input,  // declare whether the user may draw links to/from here
+                            fromLinkableDuplicates: output, toLinkableDuplicates: input,
+                  fromLinkableSelfNode: output, toLinkableSelfNode: input,
+                  cursor: "pointer"  // show a different cursor to indicate potential link point
+               });
+    }
+
+    // define the Node templates for regular nodes
+
+    var lightText = 'whitesmoke';
+
+    myDiagram.nodeTemplateMap.add("",  // the default category
+      $(go.Node, "Spot", nodeStyle(),
+        // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+        $(go.Panel, "Auto",{ _isLinkLabel: true },
+          $(go.Shape, "Rectangle",
+            { fill: "#00A9C9", stroke: "Black" },
+            new go.Binding("figure", "figure")),
+          $(go.TextBlock,
+            {
+              textAlign: "center",
+            font: "bold 12pt Helvetica, Arial, sans-serif",
+              stroke: lightText,
+              margin: 8,
+              maxSize: new go.Size(160, NaN),
+              wrap: go.TextBlock.WrapFit,
+              editable: true
+            },
+            new go.Binding("text").makeTwoWay())
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, false, true),
+        makePort("L", go.Spot.Left, true, true),
+        makePort("R", go.Spot.Right, true, true),
+        makePort("B", go.Spot.Bottom, true, false)
+      ));
+    
+      myDiagram.nodeTemplateMap.add("blank",  // the default category
+      $(go.Node, "Spot", nodeStyle(),
+        // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+        $(go.Panel, "Auto",
+          $(go.Shape, "Rectangle",
+            { desiredSize: new go.Size(60, 60),fill: "rgba(0, 169, 201, 0.01)", stroke: "white" },
+            new go.Binding("figure", "figure"))
+        
+        ),
+      ));
+      
+    myDiagram.nodeTemplateMap.add("Start",
+      $(go.Node, "Spot", nodeStyle(),
+        $(go.Panel, "Auto",
+          $(go.Shape, "RoundedRectangle",
+            { parameter1: 30, fill: "#79C900", stroke: "Black" }),
+          $(go.TextBlock, "Start",
+            {editable: true, font: "bold 11pt Helvetica, Arial, sans-serif", stroke: lightText },
+            new go.Binding("text"))
+        ),
+        // three named ports, one on each side except the top, all output only:
+
+        makePort("B", go.Spot.Bottom, true, false)
+      ));
+
+    myDiagram.nodeTemplateMap.add("Stop",
+      $(go.Node, "Spot", nodeStyle(),
+        $(go.Panel, "Auto",
+          $(go.Shape, "RoundedRectangle",
+            { parameter1: 30, minSize: new go.Size(40, 40), fill: "#DC3C00", stroke: "Black" }),
+          $(go.TextBlock, "Stop",
+            {editable: true, font: "bold 11pt Helvetica, Arial, sans-serif", stroke: lightText },
+            new go.Binding("text"))
+        ),
+        // three named ports, one on each side except the bottom, all input only:
+        makePort("T", go.Spot.Top, false, true)
+      ));
+
+    myDiagram.nodeTemplateMap.add("Comment",
+      $(go.Node, "Auto", nodeStyle(),
+        $(go.Shape, "File",
+          { fill: "#EFFAB4", stroke: null }),
+        $(go.TextBlock,
+          {
+            margin: 5,
+            maxSize: new go.Size(200, NaN),
+            wrap: go.TextBlock.WrapFit,
+            textAlign: "center",
+            editable: true,
+            font: "bold 12pt Helvetica, Arial, sans-serif",
+            stroke: '#454545'
+          },
+          new go.Binding("text").makeTwoWay())
+        // no ports, because no links are allowed to connect with a comment
+      ));
+
+    myDiagram.nodeTemplateMap.add("General",
+      $(go.Node, "Spot", nodeStyle(),
+        $(go.Panel, "Auto",{ visible: true, name: "LABEL", segmentIndex: 2, segmentFraction: 0.5},
+          new go.Binding("visible", "visible").makeTwoWay(),
+          $(go.Shape, "Rectangle",
+            { fill: "#00A9C9", stroke: "Black" },
+            new go.Binding("figure", "figure")),
+          $(go.TextBlock,
+            {
+              font: "bold 11pt Helvetica, Arial, sans-serif",
+              stroke: lightText,
+              margin: 8,
+              maxSize: new go.Size(160, NaN),
+              wrap: go.TextBlock.WrapFit,
+              editable: true
+            },
+            new go.Binding("text").makeTwoWay())
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, false, true, true, false, true, true),
+        makePort("B", go.Spot.Bottom, true, false, false, true, true, true),
+        
+      ));
+      myDiagram.nodeTemplateMap.add("InputOutput",
+      $(go.Node, "Spot", nodeStyle(),
+        $(go.Panel, "Auto",
+          $(go.Shape, "Parallelogram1",
+            { fill: "#00A9C9", stroke: "Black" },
+            new go.Binding("figure", "figure")),
+          $(go.TextBlock,
+            {
+              font: "bold 11pt Helvetica, Arial, sans-serif",
+              stroke: lightText,
+              margin: 8,
+              maxSize: new go.Size(160, NaN),
+              wrap: go.TextBlock.WrapFit,
+              editable: true
+            },
+            new go.Binding("text").makeTwoWay())
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, false, true),
+        makePort("B", go.Spot.Bottom, true, false)
+      ));
+      
+      myDiagram.nodeTemplateMap.add("SubProcedure",
+      $(go.Node, "Spot", nodeStyle(),
+        $(go.Panel, "Auto",
+          $(go.Shape, "Procedure",
+            { fill: "#00A9C9", stroke: "Black" },
+            new go.Binding("figure", "figure")),
+          $(go.TextBlock,
+            {
+              font: "bold 11pt Helvetica, Arial, sans-serif",
+              stroke: lightText,
+              margin: 8,
+              maxSize: new go.Size(160, NaN),
+              wrap: go.TextBlock.WrapFit,
+              editable: true
+            },
+            new go.Binding("text").makeTwoWay())
+        ),
+        // four named ports, one on each side:
+        makePort("T", go.Spot.Top, false, true),
+        makePort("B", go.Spot.Bottom, true, false)
+      ));
+      
+    // replace the default Link template in the linkTemplateMap
+    myDiagram.linkTemplate =
+      $(go.Link,  // the whole link panel
+        {
+          routing: go.Link.AvoidsNodes,
+          curve: go.Link.JumpOver,
+          corner: 5, toShortLength: 4,
+          relinkableFrom: true,
+          relinkableTo: true,
+          reshapable: true,
+          resegmentable: true,
+          // mouse-overs subtly highlight links:
+          mouseEnter: function(e, link) { link.findObject("HIGHLIGHT").stroke = "rgba(30,144,255,0.2)"; },
+          mouseLeave: function(e, link) { link.findObject("HIGHLIGHT").stroke = "transparent"; }
+        },
+        new go.Binding("points").makeTwoWay(),
+        $(go.Shape,  // the highlight shape, normally transparent
+          { isPanelMain: true, strokeWidth: 8, stroke: "transparent", name: "HIGHLIGHT" }),
+        $(go.Shape,  // the link path shape
+          { isPanelMain: true, stroke: "gray", strokeWidth: 2 }),
+        $(go.Shape,  // the arrowhead
+          { toArrow: "standard", stroke: null, fill: "gray"}),
+        $(go.Panel, "Auto",  // the link label, normally not visible
+          { segmentOffset: new go.Point(0, 20),visible: false, name: "LABEL", segmentIndex: 1, segmentFraction: 0.2},
+          new go.Binding("visible", "visible").makeTwoWay(),
+          $(go.Shape, "RoundedRectangle",  // the label shape
+            { fill: "#F8F8F8", stroke: null }),
+          $(go.TextBlock, "Yes", // the label
+            {
+              textAlign: "center", 
+              font: "14pt helvetica, arial, sans-serif",
+              stroke: "#333333",
+              editable: true
+            },
+            new go.Binding("text").makeTwoWay())
+        )
+      );
+
+    // Make link labels visible if coming out of a "conditional" node.
+    // This listener is called by the "LinkDrawn" and "LinkRelinked" DiagramEvents.
+    function showLinkLabel(e) {
+      var label = e.subject.findObject("LABEL");
+      if (label !== null) label.visible = (e.subject.fromNode.data.figure === "Diamond");
+    }
+
+    // temporary links used by LinkingTool and RelinkingTool are also orthogonal:
+    myDiagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
+    myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
+  myDiagram.toolManager.draggingTool.isGridSnapEnabled = true;
+  myDiagram.initialContentAlignment = go.Spot.Center;
+      
+    load();  // load an initial diagram from some JSON text
+
+    // initialize the Palette that is on the left side of the page
+    myPalette =
+      $(go.Palette, "myPaletteDiv",  // must name or refer to the DIV HTML element
+        {
+          "animationManager.duration": 800, // slightly longer than default (600ms) animation
+          nodeTemplateMap: myDiagram.nodeTemplateMap,  // share the templates used by myDiagram
+          model: new go.GraphLinksModel([  // specify the contents of the Palette
+                 { category: "blank", text: "" },
+              { category: "Start", text: "Start" },
+              { category: "InputOutput", text: "InputOutput" }, 
+             { category: "General", text: "General" },
+               { text: "Decision", figure: "Diamond" },             
+              { category: "SubProcedure", text: "SubProcedure" },
+              { category: "Stop", text: "Stop" },
+
+             { category: "Comment", text: "Comment" }
+          ])
+        });
+
+    // The following code overrides GoJS focus to stop the browser from scrolling
+    // the page when either the Diagram or Palette are clicked or dragged onto.
+
+    function customFocus() {
+      var x = window.scrollX || window.pageXOffset;
+      var y = window.scrollY || window.pageYOffset;
+      go.Diagram.prototype.doFocus.call(this);
+      window.scrollTo(x, y);
+    }
+
+    myDiagram.doFocus = customFocus;
+    myPalette.doFocus = customFocus;
+
+
+  } // end init
+
+  // Make all ports on a node visible when the mouse is over the node
+  function showPorts(node, show) {
+    var diagram = node.diagram;
+    if (!diagram || diagram.isReadOnly || !diagram.allowLink) return;
+    node.ports.each(function(port) {
+        port.stroke = (show ? "white" : null);
+      });
+  }
+
+      // save a model to and load a model from JSON text, displayed below the Diagram
+    function save() {
+      document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+      myDiagram.isModified = false;
+    }
+    function load() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+
+  // When the blob is complete, make an anchor tag for it and use the tag to initiate a download
+  // Works in:
+  // * Chrome
+  // * IE11, Edge
+  // * Firefox
+  function myCallback(blob) {
+    var url = window.URL.createObjectURL(blob);
+    var filename = "Solution.png";
+
+    var a = document.createElement("a");
+    a.style = "display: none";
+    a.href = url;
+    a.download = filename;
+
+    // IE 11
+    if (window.navigator.msSaveBlob !== undefined) {
+      window.navigator.msSaveBlob(blob, filename);
+      return;
+    }
+
+    document.body.appendChild(a);
+    requestAnimationFrame(function() {
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    });
+  }
+
+  function makeBlob() {
+    var blob = myDiagram.makeImageData( { background: "white", returnType: "blob", callback: myCallback });
+  }
+</script>
+</head>
+<body onload="init()">
+<div id="sample">
+  <div style="width:100%; white-space:nowrap;">
+    <span style="display: inline-block; vertical-align: top; width:170px">
+      <div id="myPaletteDiv" style="border: solid 1px black; height: 720px"></div>
+    </span>
+
+    <span style="display: inline-block; vertical-align: top; width:80%">
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 720px"></div>
+    </span>
+  </div>
+<button id="blobButton">Take Image and Download</button> Desktop only
+   <!--<button id="saveModel" onclick="save()">Save</button>-->
+    <!--<button onclick="load()">Load</button>-->
+  
+  <textarea id="mySavedModel" style="width:100%;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"key":-1, "category":"Start", "loc":"170 0", "text":"Start"},
+{"key":-2, "category":"Stop", "loc":"170 510", "text":"Stop"},
+{"category":"Start", "text":"Flash", "key":-12, "loc":"-230 100"},
+{"category":"InputOutput", "text":"InputOutput", "key":-3, "loc":"170 80"},
+{"category":"General", "text":"General", "key":-4, "loc":"170.09999999999997 160.65"},
+{"text":"Decision", "figure":"Diamond", "key":-5, "loc":"170 260"},
+{"category":"SubProcedure", "text":"Flash", "key":-6, "loc":"440 290"},
+{"category":"General", "text":"General", "key":-8, "loc":"170 410"},
+{"category":"Stop", "text":"Return", "key":-7, "loc":"-230 560"},
+{"category":"InputOutput", "text":"InputOutput", "key":-10, "loc":"-230 240"},
+{"category":"General", "text":"General", "key":-11, "loc":"-230 300"},
+{"category":"General", "text":"General", "key":-13, "loc":"-230 160"},
+{"category":"InputOutput", "text":"InputOutput", "key":-14, "loc":"-230 350"},
+{"category":"General", "text":"General", "key":-15, "loc":"-230 400"},
+{"text":"LOOP 5 TIMES?", "figure":"Diamond", "key":-16, "loc":"-230 470"}
+ ],
+  "linkDataArray": [ 
+{"from":-12, "to":-13, "fromPort":"B", "toPort":"T", "points":[-230,125.00626679912303,-230,135.006266799123,-229.99999999999994,135.006266799123,-229.99999999999994,133.56227569580076,-229.9999999999999,133.56227569580076,-229.9999999999999,143.56227569580076]},
+{"from":-13, "to":-10, "fromPort":"B", "toPort":"T", "points":[-229.9999999999999,176.4377243041992,-229.9999999999999,186.4377243041992,-229.9999999999999,200,-230,200,-230,213.56227569580076,-230,223.56227569580076]},
+{"from":-10, "to":-11, "fromPort":"B", "toPort":"T", "points":[-230,256.4377243041992,-230,266.4377243041992,-230,269.99999999999994,-229.99999999999994,269.99999999999994,-229.99999999999994,273.5622756958007,-229.99999999999994,283.5622756958007]},
+{"from":-11, "to":-14, "fromPort":"B", "toPort":"T", "points":[-229.99999999999994,316.4377243041991,-229.99999999999994,326.4377243041991,-230.00000000000006,326.4377243041991,-230.00000000000006,323.562275695801,-230.00000000000017,323.562275695801,-230.00000000000017,333.562275695801]},
+{"from":-14, "to":-15, "fromPort":"B", "toPort":"T", "points":[-230.00000000000017,366.43772430419943,-230.00000000000017,376.43772430419943,-230.00000000000014,376.43772430419943,-230.00000000000014,373.56227569580074,-230.0000000000001,373.56227569580074,-230.0000000000001,383.56227569580074]},
+{"from":-15, "to":-16, "fromPort":"B", "toPort":"T", "points":[-230.0000000000001,416.43772430419915,-230.0000000000001,426.43772430419915,-230.00000000000006,426.43772430419915,-230.00000000000006,426.1734375,-230,426.1734375,-230,436.1734375]},
+{"from":-16, "to":-7, "fromPort":"B", "toPort":"T", "visible":true, "points":[-230,503.82656249999997,-230,513.8265624999999,-230,519.4101478504384,-230,519.4101478504384,-230,524.9937332008769,-230,534.9937332008769]},
+{"from":-16, "to":-10, "fromPort":"R", "toPort":"T", "visible":true, "points":[-91.7109375,470,-81.7109375,470,-81.7109375,213.56227569580076,-155.85546875,213.56227569580076,-230,213.56227569580076,-230,223.56227569580076], "text":"No"},
+{"from":-1, "to":-3, "fromPort":"B", "toPort":"T", "points":[170.00000000000009,25.006266799123026,170.00000000000009,35.006266799123026,170.00000000000009,44.2842712474619,170,44.2842712474619,170,53.56227569580078,170,63.56227569580078]},
+{"from":-3, "to":-4, "fromPort":"B", "toPort":"T", "points":[170,96.43772430419921,170,106.43772430419921,170,120.325,170.09999999999997,120.325,170.09999999999997,134.2122756958008,170.09999999999997,144.2122756958008]},
+{"from":-4, "to":-5, "fromPort":"B", "toPort":"T", "points":[170.09999999999997,177.08772430419924,170.09999999999997,187.08772430419924,170.09999999999997,201.6305809020996,170.00000000000009,201.6305809020996,170.00000000000009,216.17343749999995,170.00000000000009,226.17343749999995]},
+{"from":-5, "to":-8, "fromPort":"B", "toPort":"T", "visible":true, "points":[170.00000000000009,293.82656249999997,170.00000000000009,303.82656249999997,170.00000000000009,343.69441909790044,169.99999999999994,343.69441909790044,169.99999999999994,383.56227569580096,169.99999999999994,393.56227569580096]},
+{"from":-8, "to":-2, "fromPort":"B", "toPort":"T", "points":[169.99999999999994,426.4377243041994,169.99999999999994,436.4377243041994,169.99999999999994,455.7157287525381,169.99999999999997,455.7157287525381,169.99999999999997,474.9937332008768,169.99999999999997,484.9937332008768]},
+{"from":-5, "to":-6, "fromPort":"R", "toPort":"T", "visible":true, "points":[253.18750000000009,259.99999999999994,263.1875000000001,259.99999999999994,440,259.99999999999994,440,261.78113784790037,440,263.5622756958008,440,273.5622756958008], "text":"No"},
+{"from":-6, "to":-8, "fromPort":"B", "toPort":"T", "points":[440,306.4377243041992,440,316.4377243041992,440,350.0000000000001,169.99999999999994,350.0000000000001,169.99999999999994,383.56227569580096,169.99999999999994,393.56227569580096]}
+ ]}
+  </textarea>
+
+  <div id="SVGArea"></div>
+</div>
+</body>
+</html>
