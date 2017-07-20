@@ -1233,11 +1233,10 @@ $(go.Shape, "NotAllowed",
         { // share the templates with the main Diagram
         nodeTemplateMap: palNodeTemplateMap,
           groupTemplateMap: palGroupTemplateMap,
-          padding: new go.Margin(60, 10),
+                    padding: new go.Margin(60, 10),
           layout: $(go.GridLayout,
-                    {
-                     cellSize: new go.Size(1,1),
-                     spacing: new go.Size(5,5),
+                    {cellSize: new go.Size(1, 1),
+                     spacing: new go.Size(5, 5),
                      comparer: keyCompare
                     })
         });
@@ -1281,22 +1280,21 @@ $(go.Shape, "NotAllowed",
       copiesArrayObjects: true,
       nodeDataArray: [
       // -------------------------- Event Nodes
-      
-          { key: 101, category: "event", text: "Input",   eventType: 1, eventDimension: 1, item: "Input"},
-        { key: 102, category: "event", text: "Output", eventType: 1, eventDimension: 8, item: "OutPut"}, // BpmnTaskMessage
+        { key: 101, category: "event", text: "Input",   eventType: 1, eventDimension: 1, item: "start"},
+        { key: 102, category: "event", text: "Output", eventType: 1, eventDimension: 8, item: "Message"}, // BpmnTaskMessage
 //        { key: 103, category: "event", text: "Timer",   eventType: 3, eventDimension: 3, item: "Timer"},
 //        { key: 104, category: "event", text: "End",     eventType: 1, eventDimension: 8, item: "End"},
 //        { key: 107, category: "event", text: "Message", eventType: 2, eventDimension: 8, item: "Message"},// BpmnTaskMessage
 //        { key: 108, category: "event", text: "Terminate", eventType: 13, eventDimension: 8, item: "Terminate"},
-                  { key: 133, category: "event2", text: "System\nBoundary",   eventType: 1, eventDimension: 3, item: "System Boundary"},
+                  { key: 133, category: "event2", text: "System\nBoundary",   eventType: 1, eventDimension: 3, item: "start"},
       // -------------------------- Task/Activity Nodes
-        { key: 131, category: "activity", text: "System", item: "System", taskType: 0},
+        { key: 131, category: "activity", text: "System", item: "generic task", taskType: 0},
       //  { key: 132, category: "activity", text: "User Task", item: "User task", taskType: 2},
   //      { key: 133, category: "activity", text: "System\nBoundary", item: "generic task", taskType: 6, eventType: 1, eventDimension: 3},
       // subprocess and start and end
         { key: 134, category: "subprocess", loc: "0 0", text: "Sub\nSystem", isGroup: true, isSubProcess: true, taskType: 0 },
-  //        { key: -802, category: "event", loc: "0 0", group: 134,  text: "Input", eventType: 1, eventDimension: 1, item: "start" },
-    //      { key: -803, category: "event", loc: "350 0", group: 134,  text: "OutPut", eventType: 1, eventDimension: 8, item: "end", name: "end" },
+          { key: -802, category: "event", loc: "0 0", group: 134,  text: "Input", eventType: 1, eventDimension: 1, item: "start" },
+          { key: -803, category: "event", loc: "350 0", group: 134,  text: "Output", eventType: 1, eventDimension: 8, item: "end", name: "end" },
       // -------------------------- Gateway Nodes, Data, Pool and Annotation
  //       { key: 201, category: "gateway", text: "Parallel", gatewayType: 1},
   //      { key: 204, category: "gateway", text: "Exclusive", gatewayType: 4},
@@ -1408,7 +1406,7 @@ $(go.Shape, "NotAllowed",
   myOverview.box.elt(0).stroke = "dodgerblue";
 
   // start with a simple preset model:
-  loadJSON("../assets/js/OMG BPMN by Example Figure 5.1.json")
+  loadJSON("BPMNdata/OMG BPMN by Example Figure 5.1.json")
 
 } // end init
 
