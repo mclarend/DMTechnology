@@ -117,8 +117,8 @@
             { desiredSize: new go.Size(60, 60),fill: "rgba(0, 169, 201, 0.01)", stroke: "white" },
             new go.Binding("figure", "figure"))
         
-        ),
-      ));
+        )
+     ));
       
     myDiagram.nodeTemplateMap.add("Start",
       $(go.Node, "Spot", nodeStyle(),
@@ -185,7 +185,7 @@
         ),
         // four named ports, one on each side:
         makePort("T", go.Spot.Top, false, true, true, false, true, true),
-        makePort("B", go.Spot.Bottom, true, false, false, true, true, true),
+        makePort("B", go.Spot.Bottom, true, false, false, true, true, true)
         
       ));
       myDiagram.nodeTemplateMap.add("InputOutput",
