@@ -492,7 +492,7 @@ jQuery( "#menuui" ).menu({
  var errorDNodeTemplate =
   $(go.Node, "Spot",
      { locationObjectName: "SHAPE", locationSpot: go.Spot.Center,
-       resizable: true, resizeObjectName: "PANEL",
+       resizable: false, resizeObjectName: "PANEL",
        toolTip: tooltiptemplate,
        selectionAdorned: false,  // use a Binding on the Shape.stroke to show selection
        contextMenu: activityNodeMenu,
@@ -540,7 +540,7 @@ jQuery( "#menuui" ).menu({
         ),  // end main body rectangles spot panel
       $(go.TextBlock, // the center text
         { alignment: go.Spot.TopLeft, textAlign: "left", margin: 2,font: "bold 12pt Helvetica, Arial, sans-serif",
-          editable: false
+          editable: false,
         },
         new go.Binding("text").makeTwoWay())
       )  // end Auto Panel
@@ -633,7 +633,8 @@ $(go.Shape, "NotAllowed",
             )
         ),  // end Auto Panel
         $(go.TextBlock,
-          { alignment: go.Spot.Center, textAlign: "center", margin: 5, editable: true },
+          { alignment: go.Spot.Top, textAlign: "center", margin: 5, font: "12pt  Arial, sans-serif",
+          editable: false },
           new go.Binding("text").makeTwoWay())
 
       );
@@ -1448,23 +1449,23 @@ $(go.Shape, "NotAllowed",
       copiesArrayObjects: true,
       nodeDataArray: [
       // -------------------------- Event Nodes
-        { key: 101, category: "event", text: "Input",   eventType: 1, eventDimension: 1, item: "start"},
-        { key: 102, category: "event", text: "Output", eventType: 1, eventDimension: 8, item: "Message"}, // BpmnTaskMessage
+        { key: 101, category: "event", text: "Input",   eventType: 1, eventDimension: 1, item: "Input"},
+        { key: 102, category: "event", text: "Output", eventType: 1, eventDimension: 8, item: "Output"}, // BpmnTaskMessage
 //        { key: 103, category: "event", text: "Timer",   eventType: 3, eventDimension: 3, item: "Timer"},
 //        { key: 104, category: "event", text: "End",     eventType: 1, eventDimension: 8, item: "End"},
 //        { key: 107, category: "event", text: "Message", eventType: 2, eventDimension: 8, item: "Message"},// BpmnTaskMessage
 //        { key: 108, category: "event", text: "Terminate", eventType: 13, eventDimension: 8, item: "Terminate"},
-                  { key: 133, category: "event2", text: "System\nBoundary",   eventType: 1, eventDimension: 3, item: "start"},
-				  { key: 135, category: "event3", text: "Amp",   eventType: 1, eventDimension: 1, item: "start"},
-				  { key: 136, category: "errorD", text: ".       _\n\n. +",   item: "generic task", taskType: 0},
+                  { key: 133, category: "event2", text: "System\nBoundary",   eventType: 1, eventDimension: 3, item: "System Boundary"},
+				  { key: 135, category: "event3", text: "Amp",   eventType: 1, eventDimension: 1, item: "Amplifier"},
+				  { key: 136, category: "errorD", text: ".       _\n\n. +",   item: "Error Detector", taskType: 0},
       // -------------------------- Task/Activity Nodes
-        { key: 131, category: "activity", text: "System", item: "generic task", taskType: 0},
+        { key: 131, category: "activity", text: "System", item: "System", taskType: 0},
       //  { key: 132, category: "activity", text: "User Task", item: "User task", taskType: 2},
   //      { key: 133, category: "activity", text: "System\nBoundary", item: "generic task", taskType: 6, eventType: 1, eventDimension: 3},
       // subprocess and start and end
-        { key: 134, category: "subprocess", loc: "0 0", text: "Sub\nSystem", isGroup: true, isSubProcess: true, taskType: 0 },
-          { key: -802, category: "event", loc: "0 0", group: 134,  text: "Input", eventType: 1, eventDimension: 1, item: "start" },
-          { key: -803, category: "event", loc: "350 0", group: 134,  text: "Output", eventType: 1, eventDimension: 8, item: "end", name: "end" },
+        { key: 134, category: "subprocess", loc: "0 0", text: "Sub\nSystem", isGroup: true, isSubProcess: true, item: "Sub System", taskType: 0 },
+          { key: -802, category: "event", loc: "0 0", group: 134,  text: "Input", eventType: 1, eventDimension: 1, item: "Input" },
+          { key: -803, category: "event", loc: "350 0", group: 134,  text: "Output", eventType: 1, eventDimension: 8, item: "Output", name: "end" },
       // -------------------------- Gateway Nodes, Data, Pool and Annotation
  //       { key: 201, category: "gateway", text: "Parallel", gatewayType: 1},
   //      { key: 204, category: "gateway", text: "Exclusive", gatewayType: 4},
@@ -2156,10 +2157,50 @@ function myCallback(blob) {
 
 
 
-  </div><button id="blobButton">Take Image and Download</button> Desktop only
+  </div><button id="blobButton">Take Image and Download</button> Desktop only (Not working yet, work in progress)
    <!--<button id="saveModel" onclick="save()">Save</button>-->
     <!--<button onclick="load()">Load</button>-->
-  
+    <textarea id="mySavedModel" style="width:100%;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"key":-1, "category":"Start", "loc":"170 0", "text":"Start"},
+{"key":-2, "category":"Stop", "loc":"170 510", "text":"Stop"},
+{"category":"Start", "text":"Flash", "key":-12, "loc":"-230 100"},
+{"category":"InputOutput", "text":"InputOutput", "key":-3, "loc":"170 80"},
+{"category":"General", "text":"General", "key":-4, "loc":"170.09999999999997 160.65"},
+{"text":"Decision", "figure":"Diamond", "key":-5, "loc":"170 260"},
+{"category":"SubProcedure", "text":"Flash", "key":-6, "loc":"440 290"},
+{"category":"General", "text":"General", "key":-8, "loc":"170 410"},
+{"category":"Stop", "text":"Return", "key":-7, "loc":"-230 560"},
+{"category":"InputOutput", "text":"InputOutput", "key":-10, "loc":"-230 240"},
+{"category":"General", "text":"General", "key":-11, "loc":"-230 300"},
+{"category":"General", "text":"General", "key":-13, "loc":"-230 160"},
+{"category":"InputOutput", "text":"InputOutput", "key":-14, "loc":"-230 350"},
+{"category":"General", "text":"General", "key":-15, "loc":"-230 400"},
+{"text":"LOOP 5 TIMES?", "figure":"Diamond", "key":-16, "loc":"-230 470"}
+ ],
+  "linkDataArray": [ 
+{"from":-12, "to":-13, "fromPort":"B", "toPort":"T", "points":[-230,125.00626679912303,-230,135.006266799123,-229.99999999999994,135.006266799123,-229.99999999999994,133.56227569580076,-229.9999999999999,133.56227569580076,-229.9999999999999,143.56227569580076]},
+{"from":-13, "to":-10, "fromPort":"B", "toPort":"T", "points":[-229.9999999999999,176.4377243041992,-229.9999999999999,186.4377243041992,-229.9999999999999,200,-230,200,-230,213.56227569580076,-230,223.56227569580076]},
+{"from":-10, "to":-11, "fromPort":"B", "toPort":"T", "points":[-230,256.4377243041992,-230,266.4377243041992,-230,269.99999999999994,-229.99999999999994,269.99999999999994,-229.99999999999994,273.5622756958007,-229.99999999999994,283.5622756958007]},
+{"from":-11, "to":-14, "fromPort":"B", "toPort":"T", "points":[-229.99999999999994,316.4377243041991,-229.99999999999994,326.4377243041991,-230.00000000000006,326.4377243041991,-230.00000000000006,323.562275695801,-230.00000000000017,323.562275695801,-230.00000000000017,333.562275695801]},
+{"from":-14, "to":-15, "fromPort":"B", "toPort":"T", "points":[-230.00000000000017,366.43772430419943,-230.00000000000017,376.43772430419943,-230.00000000000014,376.43772430419943,-230.00000000000014,373.56227569580074,-230.0000000000001,373.56227569580074,-230.0000000000001,383.56227569580074]},
+{"from":-15, "to":-16, "fromPort":"B", "toPort":"T", "points":[-230.0000000000001,416.43772430419915,-230.0000000000001,426.43772430419915,-230.00000000000006,426.43772430419915,-230.00000000000006,426.1734375,-230,426.1734375,-230,436.1734375]},
+{"from":-16, "to":-7, "fromPort":"B", "toPort":"T", "visible":true, "points":[-230,503.82656249999997,-230,513.8265624999999,-230,519.4101478504384,-230,519.4101478504384,-230,524.9937332008769,-230,534.9937332008769]},
+{"from":-16, "to":-10, "fromPort":"R", "toPort":"T", "visible":true, "points":[-91.7109375,470,-81.7109375,470,-81.7109375,213.56227569580076,-155.85546875,213.56227569580076,-230,213.56227569580076,-230,223.56227569580076], "text":"No"},
+{"from":-1, "to":-3, "fromPort":"B", "toPort":"T", "points":[170.00000000000009,25.006266799123026,170.00000000000009,35.006266799123026,170.00000000000009,44.2842712474619,170,44.2842712474619,170,53.56227569580078,170,63.56227569580078]},
+{"from":-3, "to":-4, "fromPort":"B", "toPort":"T", "points":[170,96.43772430419921,170,106.43772430419921,170,120.325,170.09999999999997,120.325,170.09999999999997,134.2122756958008,170.09999999999997,144.2122756958008]},
+{"from":-4, "to":-5, "fromPort":"B", "toPort":"T", "points":[170.09999999999997,177.08772430419924,170.09999999999997,187.08772430419924,170.09999999999997,201.6305809020996,170.00000000000009,201.6305809020996,170.00000000000009,216.17343749999995,170.00000000000009,226.17343749999995]},
+{"from":-5, "to":-8, "fromPort":"B", "toPort":"T", "visible":true, "points":[170.00000000000009,293.82656249999997,170.00000000000009,303.82656249999997,170.00000000000009,343.69441909790044,169.99999999999994,343.69441909790044,169.99999999999994,383.56227569580096,169.99999999999994,393.56227569580096]},
+{"from":-8, "to":-2, "fromPort":"B", "toPort":"T", "points":[169.99999999999994,426.4377243041994,169.99999999999994,436.4377243041994,169.99999999999994,455.7157287525381,169.99999999999997,455.7157287525381,169.99999999999997,474.9937332008768,169.99999999999997,484.9937332008768]},
+{"from":-5, "to":-6, "fromPort":"R", "toPort":"T", "visible":true, "points":[253.18750000000009,259.99999999999994,263.1875000000001,259.99999999999994,440,259.99999999999994,440,261.78113784790037,440,263.5622756958008,440,273.5622756958008], "text":"No"},
+{"from":-6, "to":-8, "fromPort":"B", "toPort":"T", "points":[440,306.4377243041992,440,316.4377243041992,440,350.0000000000001,169.99999999999994,350.0000000000001,169.99999999999994,383.56227569580096,169.99999999999994,393.56227569580096]}
+ ]}
+  </textarea>
+
+  <div id="SVGArea"></div>
 </div>
 </body>
 </html>
