@@ -17,8 +17,8 @@
   
     var red = "forestgreen";  // 0 or false
     var green = "red";  // 1 or true
-	var fanOn = "./assets/M.png";
-		var motorOff = "./assets/M.png";
+	var MotorOn = "./assets/M.png";
+		var MotorOff = "./assets/M.png";
 		    var blue = "blue";
 					    var white = "white";
 						var lampoff = "brown";
@@ -112,7 +112,7 @@ initialScale: 1.5,
       }
       function portStyle(input) {
         return {
-          desiredSize: new go.Size(10, 2),
+          desiredSize: new go.Size(15, 2),
           fill: "black",
           fromSpot: go.Spot.Center,
           fromLinkable: !input,
@@ -124,7 +124,7 @@ initialScale: 1.5,
       }
 	        function portStyleB(input) {
         return {
-          desiredSize: new go.Size(30, 30),
+          desiredSize: new go.Size(35, 35),
           fill: "transparent",
 		  stroke: "transparent",
           fromSpot: go.Spot.Center,
@@ -137,12 +137,12 @@ initialScale: 1.5,
       }
 	  	        function portStyleC(input) {
         return {
-          desiredSize: new go.Size(30, 30),
+          desiredSize: new go.Size(35, 35),
           fill: "transparent",
 		  stroke: "transparent",
           fromSpot: go.Spot.Left,
           fromLinkable: !input,
-          toSpot: go.Spot.Left,
+          toSpot: go.Spot.Center,
           toLinkable: input,
           toMaxLinks: 1,
           cursor: "pointer",
@@ -150,7 +150,7 @@ initialScale: 1.5,
       }
 	  	  	        function portStyleD(input) {
         return {
-          desiredSize: new go.Size(30, 30),
+          desiredSize: new go.Size(35, 35),
           fill: "transparent",
 		  stroke: "transparent",
           fromSpot: go.Spot.Right,
@@ -178,8 +178,8 @@ initialScale: 1.5,
       function portStyle2(input) {
         return {
           desiredSize: new go.Size(10, 20),
-          fill: "black",
-          fromSpot: go.Spot.Left,
+          fill: "transparent", stroke: "transparent",
+          fromSpot: go.Spot.Top,
           fromLinkable: !input,
           toSpot: go.Spot.Right,
           toLinkable: input,
@@ -197,7 +197,11 @@ initialScale: 1.5,
               { width: 100, height: 50 })
           
         );
-            
+                       myDiagram.toolManager.linkReshapingTool.handleArchetype =
+    $(go.Shape, "Circle",
+      { width: 15, height: 15, fill: "yellow" });
+        myDiagram.toolManager.linkReshapingTool.midHandleArchetype =
+    $(go.Shape, "Diamond", { width: 15, height: 15, fill: "cyan" }); 
 		  
 		      
 		var SwitchTemplate =
@@ -207,10 +211,10 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/push switch.png",
               { width: 40, height: 40 }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           { // if double-clicked, an input node will change its value, represented by the color.
@@ -232,10 +236,10 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/slide switch.png",
               { width: 40, height: 40 }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           { // if double-clicked, an input node will change its value, represented by the color.
@@ -258,10 +262,10 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/lightoutput.png",
               { width: 50, height: 50 }),
           $(go.Shape, "Rectangle", portStyleB(true),  // the only port
-            { portId: "", alignment: new go.Spot(0.1, 0.5) }),
+            { portId: "", alignment: new go.Spot(0.05, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -272,10 +276,10 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/buzzer.png",
               { width: 50, height: 50 }),
           $(go.Shape, "Rectangle", portStyleB(true),  // the only port
-            { portId: "", alignment: new go.Spot(0.1, 0.5) }),
+            { portId: "", alignment: new go.Spot(0.05, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.10, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -286,24 +290,24 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/relay.png",
               { width: 50, height: 50 }),
 		  $(go.Shape, "Rectangle", portStyleB(true),  // the only port
-            { portId: "in1", alignment: new go.Spot(0.1, 0.5) }),
+            { portId: "in1", alignment: new go.Spot(0.05, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
 		$(go.Shape, "Rectangle", portStyleD(true),
-            { portId: "in2", alignment: new go.Spot(0.9, 0.3) }),
+            { portId: "in2", alignment: new go.Spot(0.95, 0.3) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.3),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.3),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out2", alignment: new go.Spot(1.05, 0.7),
+            { portId: "out2", alignment: new go.Spot(1.2, 0.7),
 			 }),$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.7),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.7),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -312,24 +316,24 @@ initialScale: 1.5,
         $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape, "AndGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in1", alignment: new go.Spot(0.09, 0.3) }),
+            { portId: "in1", alignment: new go.Spot(0.04, 0.3) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.3),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.1, 0.3),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in2", alignment: new go.Spot(0.09, 0.7) }),
+            { portId: "in2", alignment: new go.Spot(0.04, 0.7) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.7),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.1, 0.7),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.2, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.10, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -340,31 +344,31 @@ initialScale: 1.5,
             { portId: "in1", cursor: "pointer",  // show a different cursor to indicate potential link point
                   fromLinkable: false, toLinkable: true,
                   fromLinkableDuplicates: true, toLinkableDuplicates: false,
-                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.24, 0.3)
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.19, 0.3)
 				   }),
 				   $(go.Shape, "Rectangle",
-        { alignment: new go.Spot(0.09, 0.3),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(0.05, 0.3),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(true),
             { portId: "in2", cursor: "pointer",  // show a different cursor to indicate potential link point
                   fromLinkable: false, toLinkable: true,
                   fromLinkableDuplicates: true, toLinkableDuplicates: false,
-                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.24, 0.7) }),
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(0.19, 0.7) }),
 				  $(go.Shape, "Rectangle",
-        { alignment: new go.Spot(0.09, 0.7),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(0.05, 0.7),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(false),
             { portId: "out", 
                   fromLinkable: true, toLinkable: false,
                   fromLinkableDuplicates: true, toLinkableDuplicates: true,
-                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(1.05, 0.5),
-				   }),            { portId: "out", alignment: new go.Spot(1.05, 0.5) },$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+                  fromLinkableSelfNode: true, toLinkableSelfNode: true,alignment: new go.Spot(1.2, 0.5),
+				   }),            { portId: "out", alignment: new go.Spot(1.2, 0.5) },$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -376,10 +380,10 @@ initialScale: 1.5,
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0.17, 0.7) }),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.15, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -387,14 +391,14 @@ initialScale: 1.5,
         $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape, "NorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in1", alignment: new go.Spot(0.09, 0.3) }),
+            { portId: "in1", alignment: new go.Spot(0.05, 0.3) }),
           $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in2", alignment: new go.Spot(0.09, 0.7) }),
+            { portId: "in2", alignment: new go.Spot(0.05, 0.7) }),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.2, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -406,25 +410,33 @@ initialScale: 1.5,
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in2", alignment: new go.Spot(0.17, 0.7) }),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.2, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
       var NandTemplate =
         $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape, "NandGate", shapeStyle()),
-          $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in1", alignment: new go.Spot(-0.05, 0.3) }),
-          $(go.Shape, "Rectangle", portStyle(true),
-            { portId: "in2", alignment: new go.Spot(-0.05, 0.7) }),
+          $(go.Shape, "Rectangle", portStyleB(true),
+            { portId: "in1", alignment: new go.Spot(0.05, 0.3) }),				  $(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.09, 0.7),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error")),
+          $(go.Shape, "Rectangle", portStyleB(true),
+            { portId: "in2", alignment: new go.Spot(0.05, 0.7) }),$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.09, 0.3),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.2, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.10, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -432,17 +444,17 @@ initialScale: 1.5,
         $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Inverter", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in", alignment: new go.Spot(0.09, 0.5) }),
+            { portId: "in", alignment: new go.Spot(0.04, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(false),
-            { portId: "out", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "out", alignment: new go.Spot(1.2, 0.5) }),
 			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -453,10 +465,10 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/hot.png",
               { width: 30, height: 45 }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           { // if double-clicked, an input node will change its value, represented by the color.
@@ -489,17 +501,23 @@ initialScale: 1.5,
         );
       var BatteryTemplate =
 		$(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
-						$(go.Picture, "./assets/battery.png",
+						$(go.Picture, "./assets/plus.png",
               { width: 50, height: 75 }),
-		  $(go.Shape, "Rectangle", portStyle2(true),  // the only port
-            { portId: "+", alignment: new go.Spot(0.65, 0) }),
-          $(go.Shape, "Rectangle", portStyle2(false),
-            { portId: "-", alignment: new go.Spot(0.35, 0) })
+		  $(go.Shape, "Rectangle", portStyleC(false),  // the only port
+            { portId: "out1", alignment: new go.Spot(0.4, 0.5),fromLinkable: true, toLinkable: false, }),
+        );
+        
+        var BattTemplate =
+            $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+						$(go.Picture, "./assets/minus.png",
+              { width: 50, height: 75 }),
+		  $(go.Shape, "Rectangle", portStyleB(false),  // the only port
+            { portId: "out1", alignment: new go.Spot(0.8, 0.5),fromLinkable: true, toLinkable: false, }),
         );
         
         		      var TruthTemplate =
  $(go.Node, "Vertical",
-      { resizable: true,
+      { resizable: false,
         rotatable: false, 
         locationSpot: go.Spot.Center },
       new go.Binding("location", "loc"),
@@ -562,25 +580,26 @@ initialScale: 1.5,
         );
 			
         
-		      var FanTemplate =
+		      var MotorTemplate =
         $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
-						$(go.Picture, motorOff,
+						$(go.Picture, MotorOff,
               { width: 50, height: 50 }),
-          $(go.Shape, "Rectangle", portStyleC(false),
-            { portId: "in1", alignment: new go.Spot(0.11, 0.3) }),
-			$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.03, 0.3),
-          fill: "black", width: 10, height: 2,
+ $(go.Shape, "Rectangle", portStyleB(true),
+            { portId: "in1", alignment: new go.Spot(0.1, 0.3) })
+        ,
+		$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.06, 0.3),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in2", alignment: new go.Spot(0.11, 0.7) })
+            { portId: "in2", alignment: new go.Spot(0.1, 0.7) })
         ,
 		$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(-0.03, 0.7),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(-0.06, 0.7),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error"))
         );
@@ -590,10 +609,10 @@ initialScale: 1.5,
           $(go.Shape, "Clock", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.05, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 						$(go.Shape, "Rectangle",
-        { alignment: new go.Spot(1.05, 0.5),
-          fill: "black", width: 10, height: 2,
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
           visible: true },
         new go.Binding("visible", "error")),
           { // if double-clicked, an input node will change its value, represented by the color.
@@ -625,26 +644,22 @@ initialScale: 1.5,
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
 						myDiagram.nodeTemplateMap.add("Label", ConnectorTemplate);
 						myDiagram.nodeTemplateMap.add("Battery", BatteryTemplate);
-						myDiagram.nodeTemplateMap.add("Fan", FanTemplate);
-						myDiagram.nodeTemplateMap.add("Blank", BlankTemplate);
+        myDiagram.nodeTemplateMap.add("Batt", BattTemplate);
+						myDiagram.nodeTemplateMap.add("Motor", MotorTemplate);
+						//myDiagram.nodeTemplateMap.add("Blank", BlankTemplate);
         myDiagram.nodeTemplateMap.add("Truth", TruthTemplate);
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
       palette.model.nodeDataArray = [
 	//	{ category: "Blank" },
-		{ category: "Label",text: "Label Here" },
-		{category: "Switch" },{ category: "Light_Sensor" },
-				{category: "Slide_Switch"},
-				{ category: "Heat_Sensor"},
+		{ category: "Light_Sensor" },{ category: "Lamp" },{ category: "Heat_Sensor"},
+				{category: "Switch"},
         { category: "NOT gate" },
         { category: "AND gate" },
         { category: "OR gate" },		
-	//	{ category: "Blank" },
 		{ category: "Buzzer" },
-		{ category: "Relay" },
-		{ category: "Lamp" },
-		{ category: "Battery" },
-		{ category: "Fan" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Truth" },	
+		{ category: "Relay" },{category: "Slide_Switch" },
+		{ category: "Motor" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Truth" },{ category: "Battery" },{ category: "Batt" },{ category: "Label",text: "Label Here" },	
       ];
  
       // load the initial diagram
@@ -694,7 +709,8 @@ initialScale: 1.5,
 						case "Slide_Switch": break;
 						//case "Connector":	doConnector(node); break;
 						case "Battery":	doBattery1(node); break;
-						case "Fan":	doFan(node); break; 
+                  case "Batt":	doBatt(node); break;
+						case "Motor":	doMotor(node); break; 
                   case "Truth": break;// doInput already called, above
           }
         });
@@ -742,8 +758,10 @@ initialScale: 1.5,
       setOutputLinks(node, color);
     }
 	    function doBattery1(node) {
-      var color = !node.findLinksInto().all(linkIsTrue) ? green : green;
-      setOutputLinks(node, color);
+      setOutputLinks(node, green);
+    }
+    	    function doBatt(node) {
+      setOutputLinks(node, "black");
     }
     function doConnector(node) {
       var truecount = 0;
@@ -819,15 +837,19 @@ initialScale: 1.5,
       var color = truecount === 0? red : green;
 node.findObject("NODESHAPE").fill = color;
     }
-			function doFan(node) {
+						function doMotor(node) {
       // assume there is just one input link
       // we just need to update the node's Shape.fill
-      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
+node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
 	  });      
-	  var color = node.findLinksInto().any(linkIsTrue) ? green : red;
-      setOutputLinks(node, color);
+	  var truecount = 0;
+      node.findLinksInto("in2").each(function(link) { if (linkIsTrue(link)) truecount++; });
+                 node.findLinksInto("in1").each(function(link) { if (linkIsTrue(link)) truecount--; });
+      var color = truecount === 0? red : green;
+node.findObject("NODESHAPE").fill = color;
 
     }
+     
       
     // save a model to and load a model from JSON text, displayed below the Diagram
     function save() {
@@ -851,11 +873,11 @@ node.findObject("NODESHAPE").fill = color;
 <body onload="init()">
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
-    <span style="display: inline-block; vertical-align: top; width:240px">
-      <div id="palette" style="border: solid 1px black; height: 850px"></div>
+    <span style="display: inline-block; vertical-align: top; width:285px">
+      <div id="palette" style="border: solid 1px black; height: 1500px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width: 85%">
-      <div id="myDiagramDiv" style="border: solid 1px black; height: 850px"></div>
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 1500px"></div>
     </span>
   </div>
   <p>&nbsp;</p>
