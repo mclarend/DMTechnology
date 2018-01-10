@@ -504,7 +504,7 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/plus.png",
               { width: 50, height: 75 }),
 		  $(go.Shape, "Rectangle", portStyleC(false),  // the only port
-            { portId: "out1", alignment: new go.Spot(0.4, 0.5),fromLinkable: true, toLinkable: false, }),
+            { portId: "out1", alignment: new go.Spot(0.4, 0.5),fromLinkable: true, toLinkable: false, })
         );
         
         var BattTemplate =
@@ -512,7 +512,7 @@ initialScale: 1.5,
 						$(go.Picture, "./assets/minus.png",
               { width: 50, height: 75 }),
 		  $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "out1", alignment: new go.Spot(0.8, 0.5),fromLinkable: true, toLinkable: false, }),
+            { portId: "out1", alignment: new go.Spot(0.8, 0.5),fromLinkable: true, toLinkable: false, })
         );
         
         		      var TruthTemplate =
@@ -524,7 +524,7 @@ initialScale: 1.5,
       $(go.TextBlock,
         { text: "A",
           editable: true,
-          font: "bold 8pt Arial, Helvetica, sans-serif",
+          font: "bold 12pt Arial, Helvetica, sans-serif",
          areaBackground: "white",
           scale: 2,
           // this specific TextBlock uses a RadioButtons for editing text
@@ -536,7 +536,7 @@ initialScale: 1.5,
       $(go.TextBlock,
         { text: "?",
           editable: true,
-          font: "bold 8pt Arial, Helvetica, sans-serif",
+          font: "bold 12pt Arial, Helvetica, sans-serif",
           areaBackground: "white",
           scale: 2,
           // this specific TextBlock uses a RadioButtons for editing text
@@ -547,7 +547,7 @@ initialScale: 1.5,
       $(go.TextBlock,
         { text: "?",
           editable: true,
-          font: "bold 8pt Arial, Helvetica, sans-serif",
+          font: "bold 12pt Arial, Helvetica, sans-serif",
           areaBackground: "white",
           scale: 2,
           // this specific TextBlock uses a RadioButtons for editing text
@@ -558,7 +558,7 @@ initialScale: 1.5,
       $(go.TextBlock,
         { text: "?",
           editable: true,
-          font: "bold 8pt Arial, Helvetica, sans-serif",
+          font: "bold 12pt Arial, Helvetica, sans-serif",
           areaBackground: "white",
           scale: 2,
           // this specific TextBlock uses a RadioButtons for editing text
@@ -569,7 +569,7 @@ initialScale: 1.5,
       $(go.TextBlock,
         { text: "?",
           editable: true,
-          font: "bold 8pt Arial, Helvetica, sans-serif",
+          font: "bold 12pt Arial, Helvetica, sans-serif",
           areaBackground: "white",
           scale: 2,
           // this specific TextBlock uses a RadioButtons for editing text
@@ -659,7 +659,7 @@ initialScale: 1.5,
         { category: "OR gate" },		
 		{ category: "Buzzer" },
 		{ category: "Relay" },{category: "Slide_Switch" },
-		{ category: "Motor" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Truth" },{ category: "Battery" },{ category: "Batt" },{ category: "Label",text: "Label Here" },	
+		{ category: "Motor" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Label",text: "Label Here" },{ category: "Battery" },{ category: "Batt" },{ category: "Truth" },
       ];
  
       // load the initial diagram
@@ -840,15 +840,16 @@ node.findObject("NODESHAPE").fill = color;
 						function doMotor(node) {
       // assume there is just one input link
       // we just need to update the node's Shape.fill
-node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = link.findObject("SHAPE").stroke; 
-	  });      
-	  var truecount = 0;
-      node.findLinksInto("in2").each(function(link) { if (linkIsTrue(link)) truecount++; });
-                 node.findLinksInto("in1").each(function(link) { if (linkIsTrue(link)) truecount--; });
-      var color = truecount === 0? red : green;
-node.findObject("NODESHAPE").fill = color;
+if (node.linksConnected.count !== 2) {
+          var colour2 = node.findLinksInto().each(linkIsTrue) ? red : green}
+           else if (node.linksConnected.count === 2) {
+          var truecount = 0;
+      node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
+      var colour2 = truecount % 2 === 0 ? red : green};
+     node.findObject("NODESHAPE").fill = colour2;
+	   
 
-    }
+  }
      
       
     // save a model to and load a model from JSON text, displayed below the Diagram
@@ -874,10 +875,10 @@ node.findObject("NODESHAPE").fill = color;
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; width:285px">
-      <div id="palette" style="border: solid 1px black; height: 1500px"></div>
+      <div id="palette" style="border: solid 1px black; height: 965px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width: 85%">
-      <div id="myDiagramDiv" style="border: solid 1px black; height: 1500px"></div>
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 965px"></div>
     </span>
   </div>
   <p>&nbsp;</p>
