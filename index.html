@@ -530,7 +530,7 @@ initialScale: 1.5,
           // this specific TextBlock uses a RadioButtons for editing text
           textEditor: window.TextEditorRadioButtons, // defined in textEditorRadioButtons.js
           // this specific TextBlock has its own choices:
-          choices: ['A','B','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','Y','Z',]
+          choices: ['A','B','C','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','X','Y','Z',]
         }),
                               
       $(go.TextBlock,
@@ -629,7 +629,7 @@ initialScale: 1.5,
         );
       // add the templates created above to myDiagram and palette
       myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
-	  	        myDiagram.nodeTemplateMap.add("Heat_Sensor", Heat_SensorTemplate);
+	  	        myDiagram.nodeTemplateMap.add("Temp_Sensor", Heat_SensorTemplate);
 				myDiagram.nodeTemplateMap.add("Slide_Switch", SSwitchTemplate);
 	        myDiagram.nodeTemplateMap.add("Light_Sensor", Light_SensorTemplate);
       myDiagram.nodeTemplateMap.add("NOT gate", NOTTemplate);
@@ -652,7 +652,7 @@ initialScale: 1.5,
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
       palette.model.nodeDataArray = [
 	//	{ category: "Blank" },
-		{ category: "Light_Sensor" },{ category: "Lamp" },{ category: "Heat_Sensor"},
+		{ category: "Light_Sensor" },{ category: "Lamp" },{ category: "Temp_Sensor"},
 				{category: "Switch"},
         { category: "NOT gate" },
         { category: "AND gate" },
@@ -683,7 +683,7 @@ initialScale: 1.5,
 		            if (node.category === "Slide_Switch") {
             doInput(node);
           }
-		            if (node.category === "Heat_Sensor") {
+		            if (node.category === "Temp_Sensor") {
             doInputHS(node);
           }
 		  		    if (node.category === "Light_Sensor") {
@@ -703,7 +703,7 @@ initialScale: 1.5,
             			case "Buzzer": doOutput(node); break;
 			            case "Relay": doRelay(node); break;
             case "Lamp": doOutputL(node); break;
-            case "Heat_Sensor": break;
+            case "Temp_Sensor": break;
 			case "Light_Sensor": break;
 			case "Switch": break;
 						case "Slide_Switch": break;
@@ -921,12 +921,12 @@ if (node.linksConnected.count !== 2) {
   "nodeDataArray": [
 {"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -250" },
 {"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120" },
-{"category":"Heat_Sensor", "key":"Heat_Sensor1", "loc":"-320 -20" },
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20" },
 {"category":"Switch", "key":"Switch1", "loc":"-280 80" },
 
         {"category":"Label", "loc":"-385 -210", "text":"Slide Switch"},
         {"category":"Label", "loc":"-410 -100", "text":"Light Sensor"},
-        {"category":"Label", "loc":"-425 0", "text":"Heat Sensor"},
+        {"category":"Label", "loc":"-425 0", "text":"Temp Sensor"},
         {"category":"Label", "loc":"-385 100", "text":"Push Switch"},
         
 {"category":"NOT gate", "key":"NOT1", "loc":"-45 -230" },
