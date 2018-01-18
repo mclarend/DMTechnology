@@ -520,7 +520,7 @@ initialScale: 1.5,
       { resizable: false,
         rotatable: false, 
         locationSpot: go.Spot.Center },
-      new go.Binding("location", "loc"),
+      new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
       $(go.TextBlock,
         { text: "A",
           editable: true,
@@ -530,7 +530,7 @@ initialScale: 1.5,
           // this specific TextBlock uses a RadioButtons for editing text
           textEditor: window.TextEditorRadioButtons, // defined in textEditorRadioButtons.js
           // this specific TextBlock has its own choices:
-          choices: ['A','B','C','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','X','Y','Z',]
+          choices: ['A','B', 'C','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','X','Y','Z',]
         }),
                               
       $(go.TextBlock,
@@ -800,9 +800,11 @@ initialScale: 1.5,
 	  	  var color = node.findLinksInto().any(linkIsTrue) ? green : red; 
       setOutputLinks(node, color);
 	  node.findObject("NODESHAPE").fill = color;
-	  	  var buzzSound = new Audio('./assets/Buzz.mp3');
+	  	  var buzzSound = new Audio('./assets/buzz.mp3');
 buzzSound.loop = false;if (color === green) {
         buzzSound.play()}
+		buzzSound.loop = false;if (color === red) {
+        buzzSound.pause()}
 
     }
 		function doOutputL(node) {
@@ -814,7 +816,7 @@ buzzSound.loop = false;if (color === green) {
 	  });
 	   
       setOutputLinks(node, colour);
-	  node.findObject("NODESHAPE").fill = colour
+	  node.findObject("NODESHAPE").fill = colour;
     }
 	
 	
@@ -851,11 +853,12 @@ if (node.linksConnected.count !== 2) {
       node.findLinksInto().each(function(link) { if (linkIsTrue(link)) truecount++; });
       var colour2 = truecount % 2 === 0 ? red : green};
      node.findObject("NODESHAPE").fill = colour2;
-	   
+	     var motorSound = new Audio('./assets/Motor.mp3');
+motorSound.loop = false;if (colour2 === green) {
+        motorSound.play()}
 
   }
-     
-      function save() {
+     function save() {
       document.getElementById("mySavedModel").value = myDiagram.model.toJson();
       myDiagram.isModified = false;
     }
@@ -865,7 +868,11 @@ if (node.linksConnected.count !== 2) {
 	 document.getElementById("blobButton").addEventListener("click", makeBlob);
   }
 
-
+  // When the blob is complete, make an anchor tag for it and use the tag to initiate a download
+  // Works in:
+  // * Chrome
+  // * IE11, Edge
+  // * Firefox
   function myCallback(blob) {
     var url = window.URL.createObjectURL(blob);
     var filename = "Solution.png";
@@ -889,7 +896,6 @@ if (node.linksConnected.count !== 2) {
     });}function makeBlob() {
     var blob = myDiagram.makeImageData( { background: "white", returnType: "blob", callback: myCallback });
   }
-	
   </script>
 <style type="text/css">
 .textgreen {
@@ -910,7 +916,8 @@ if (node.linksConnected.count !== 2) {
       <div id="myDiagramDiv" style="border: solid 1px black; height: 965px"></div>
     </span>
   </div>
-  <p>&nbsp;</p></p> <button id="saveModel" onclick="save()">Save</button> <button id="blobButton">Save Image Solution</button>
+  <p>&nbsp;</p>
+<</p> <button id="saveModel" onclick="save()">Save</button> <button id="blobButton">Save Image Solution</button>
       
     </div>
     <textarea id="mySavedModel" style="width:100%;height:0px">
