@@ -10,8 +10,10 @@
     <script src="./extensions/TextEditorSelectBox.js"></script>
 <script src="./extensions/TextEditorRadioButtons.js"></script>
   <link rel='stylesheet' href='./extensions/LightBoxContextMenu.css' />
-
+<script src="./extensions/FreehandDrawingTool.js"></script>
+<script src="./assets/js/GuidedDraggingTool.js"></script> D McLaren
  <!--   <script src=".../assets/js/goSamplesRGC.js"></script>  <!-- this is only for the GoJS Samples framework -->D McLaren
+ &nbsp;<!--<button id="saveModel" onclick="save()">Save</button><button id="loadModel" onclick="load()">Load</button>-->  <button id="blobButton">Save As .PNG</button> <!--  <button onclick="mode(true)">Draw Mode</button>   <button onclick="mode(false)">Select</button>   <button onclick="load()">Decisions</button>   <button onclick="loadAND()">AND gate</button>  <button onclick="loadOR()">OR gate</button>  <button onclick="loadLatch1()">Latch1</button>  <button onclick="loadLatch2()">Latch2</button>  <button onclick="loadLatch3()">Latch3</button>  <button onclick="loadComb1()">Combination1</button>  <button onclick="loadComb2()">Combination2</button>  <button onclick="loadComb3()">Combination3</button>  <button onclick="loadComb4()">Combination4</button>  <button onclick="loadComb5()">Combination5</button>  <button onclick="loadComb6()">Combination6</button>  <button onclick="loadProblem1()">Eg. Problem</button>-->       <button onclick="loadHelp()">Help</button>
   <script src="./extensions/LightBoxContextMenu.js"></script> 
 <script id="code">
   
@@ -33,7 +35,13 @@
 initialScale: 1.5,
             initialContentAlignment: go.Spot.Left,
             
-            allowDrop: true,  // Nodes from the Palette can be dropped into the Diagram
+            allowDrop: true, 
+			initialContentAlignment: go.Spot.Center,  // center the content
+                    draggingTool: new GuidedDraggingTool(),  // defined in GuidedDraggingTool.js
+                    "draggingTool.horizontalGuidelineColor": "blue",
+                    "draggingTool.verticalGuidelineColor": "blue",
+                    "draggingTool.centerGuidelineColor": "green",
+                    "draggingTool.guidelineWidth": 1, // Nodes from the Palette can be dropped into the Diagram
             "draggingTool.isGridSnapEnabled": true,  // dragged nodes will snap to a grid of 10x10 cells
             "undoManager.isEnabled": true
           });
@@ -61,7 +69,7 @@ initialScale: 1.5,
 
         },
 
-
+		  new go.Binding("points").makeTwoWay(),
           new go.Binding("isShadowed", "isSelected").ofObject(),{ contextMenu: window.myHTMLLightBox },
           $(go.Shape,
             { name: "SHAPE", strokeWidth: 4, stroke: red }));
@@ -205,11 +213,45 @@ initialScale: 1.5,
 		  
 		      
 		var SwitchTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
 						$(go.Picture, "./assets/push switch.png",
               { width: 40, height: 40 }),
+          $(go.Shape, "Rectangle", portStyleB(false),  // the only port
+            { portId: "", alignment: new go.Spot(1.15, 0.5) }),
+						$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(1.1, 0.5),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error")),
+          { // if double-clicked, an input node will change its value, represented by the color.
+            doubleClick: function (e, obj) {
+                e.diagram.startTransaction("Toggle Input");
+                var shp = obj.findObject("NODESHAPE");
+                shp.fill = (shp.fill === green) ? red : green;
+                updateStates();
+                e.diagram.commitTransaction("Toggle Input");
+              }
+        }      
+        );
+
+var RotSwitchTemplate =
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, 
+          selectionAdorned: true,  // don't show the standard selection handle
+          resizable: false, resizeObjectName: "SHAPE",  // user can resize the Shape
+          rotatable: true, rotateObjectName: "SHAPE",  // user can rotate the Shape
+                                                       // without rotating the label
+        },
+          $(go.Shape, "Circle", shapeStyle(),
+            { fill: red }),  // override the default fill (from shapeStyle()) to be red
+						$(go.TextBlock,new go.Binding("text", "text").makeTwoWay(),
+        { text: "A",
+          editable: true,
+          font: "bold 12pt Arial, Helvetica, sans-serif",
+          areaBackground: "transparent",
+          scale: 2
+        }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
             { portId: "", alignment: new go.Spot(1.1, 0.5) }),
 						$(go.Shape, "Rectangle",
@@ -227,16 +269,14 @@ initialScale: 1.5,
               }
         }      
         );
-
-
 		var SSwitchTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
 						$(go.Picture, "./assets/slide switch.png",
               { width: 40, height: 40 }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.15, 0.5) }),
 			$(go.Shape, "Rectangle",
         { alignment: new go.Spot(1.1, 0.5),
           fill: "black", width: 15, height: 2,
@@ -256,7 +296,7 @@ initialScale: 1.5,
 	  myDiagram.contextMenu = window.myHTMLLightBox;	
 		
       var LampTemplate =
-		$(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: yellow }),  // override the default fill (from shapeStyle()) to be green
 						$(go.Picture, "./assets/lightoutput.png",
@@ -270,7 +310,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var buzzerTemplate =
-		$(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
 						$(go.Picture, "./assets/buzzer.png",
@@ -284,7 +324,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var relayTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Rectangle", shapeStyle(),
             { fill: "red" }),  // override the default fill (from shapeStyle()) to be green
 						$(go.Picture, "./assets/relay.png",
@@ -313,7 +353,7 @@ initialScale: 1.5,
         );
 		
       var AndTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "AndGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
             { portId: "in1", alignment: new go.Spot(0.04, 0.3) }),
@@ -338,7 +378,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var orTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
           $(go.Shape, "OrGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
             { portId: "in1", cursor: "pointer",  // show a different cursor to indicate potential link point
@@ -373,7 +413,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var xnorTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
           $(go.Shape, "XnorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in1", alignment: new go.Spot(0.17, 0.3) }),
@@ -388,7 +428,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
             var norTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
           $(go.Shape, "NorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in1", alignment: new go.Spot(0.05, 0.3) }),
@@ -403,7 +443,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var xorTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "XorGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyle(true),
             { portId: "in1", alignment: new go.Spot(0.17, 0.3) }),
@@ -418,7 +458,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var NandTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "NandGate", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
             { portId: "in1", alignment: new go.Spot(0.05, 0.3) }),				  $(go.Shape, "Rectangle",
@@ -441,7 +481,7 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var NOTTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center, rotatable: true,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Inverter", shapeStyle()),
           $(go.Shape, "Rectangle", portStyleB(true),
             { portId: "in", alignment: new go.Spot(0.04, 0.5) }),
@@ -459,13 +499,13 @@ initialScale: 1.5,
         new go.Binding("visible", "error"))
         );
       var Heat_SensorTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Circle", shapeStyle(),
             { fill: blue }),  // override the default fill (from shapeStyle()) to be red
 						$(go.Picture, "./assets/hot.png",
               { width: 30, height: 45 }),
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.15, 0.5) }),
 						$(go.Shape, "Rectangle",
         { alignment: new go.Spot(1.1, 0.5),
           fill: "black", width: 15, height: 2,
@@ -483,24 +523,26 @@ initialScale: 1.5,
 		  );
 		  
 		var ConnectorTemplate =
-            $(go.Node, "Auto", nodeStyle(),
+            $(go.Node, "Auto", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox,selectionAdorned: false,  // don't show the standard selection handle
+          resizable: true, resizeObjectName: "SHAPE",  // user can resize the Shape
+            },new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
         $(go.Shape, "Rectangle",
           { fill: "lightyellow", stroke: null }),
         $(go.TextBlock,
           {
             margin: 5,
-            maxSize: new go.Size(200, NaN),
+            maxSize: new go.Size(400, NaN),
             wrap: go.TextBlock.WrapFit,
             textAlign: "center",
             editable: true,
             font: "bold 12pt Helvetica, Arial, sans-serif",
             stroke: '#454545'
           },
-          new go.Binding("text").makeTwoWay())
+          new go.Binding("text","text").makeTwoWay(),new go.Binding("shape").makeTwoWay())
         // no ports, because no links are allowed to connect with a comment
         );
       var BatteryTemplate =
-		$(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+		$(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
 						$(go.Picture, "./assets/plus.png",
               { width: 50, height: 75 }),
 		  $(go.Shape, "Rectangle", portStyleC(false),  // the only port
@@ -508,7 +550,7 @@ initialScale: 1.5,
         );
         
         var BattTemplate =
-            $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+            $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
 						$(go.Picture, "./assets/minus.png",
               { width: 50, height: 75 }),
 		  $(go.Shape, "Rectangle", portStyleB(false),  // the only port
@@ -520,8 +562,8 @@ initialScale: 1.5,
       { resizable: false,
         rotatable: false, 
         locationSpot: go.Spot.Center },
-      new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
-      $(go.TextBlock,
+    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+      $(go.TextBlock,new go.Binding("text", "text").makeTwoWay(),
         { text: "A",
           editable: true,
           font: "bold 12pt Arial, Helvetica, sans-serif",
@@ -530,7 +572,7 @@ initialScale: 1.5,
           // this specific TextBlock uses a RadioButtons for editing text
           textEditor: window.TextEditorRadioButtons, // defined in textEditorRadioButtons.js
           // this specific TextBlock has its own choices:
-          choices: ['A','B', 'C','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','X','Y','Z',]
+          choices: [' ','A','B','C','Slide Switch', 'Light Sensor', 'Temp Sensor', 'Push Switch','Buzzer','Relay','Lamp','X','Y','Z',]
         }),
                               
       $(go.TextBlock,
@@ -581,7 +623,7 @@ initialScale: 1.5,
 			
         
 		      var MotorTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Circle", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be green
 						$(go.Picture, MotorOff,
@@ -603,13 +645,14 @@ initialScale: 1.5,
           visible: true },
         new go.Binding("visible", "error"))
         );
+        
 						  
 		        var Light_SensorTemplate =
-        $(go.Node, "Spot", nodeStyle(),{ contextMenu: window.myHTMLLightBox },
+        $(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Clock", shapeStyle(),
             { fill: red }),  // override the default fill (from shapeStyle()) to be red
           $(go.Shape, "Rectangle", portStyleB(false),  // the only port
-            { portId: "", alignment: new go.Spot(1.1, 0.5) }),
+            { portId: "", alignment: new go.Spot(1.15, 0.5) }),
 						$(go.Shape, "Rectangle",
         { alignment: new go.Spot(1.1, 0.5),
           fill: "black", width: 15, height: 2,
@@ -627,6 +670,8 @@ initialScale: 1.5,
               }
           }
         );
+  // load a simple diagram from the textarea
+  
       // add the templates created above to myDiagram and palette
       myDiagram.nodeTemplateMap.add("Switch", SwitchTemplate);
 	  	        myDiagram.nodeTemplateMap.add("Temp_Sensor", Heat_SensorTemplate);
@@ -647,7 +692,45 @@ initialScale: 1.5,
         myDiagram.nodeTemplateMap.add("Batt", BattTemplate);
 						myDiagram.nodeTemplateMap.add("Motor", MotorTemplate);
 						//myDiagram.nodeTemplateMap.add("Blank", BlankTemplate);
+         myDiagram.nodeTemplateMap.add("Inputs", RotSwitchTemplate);
         myDiagram.nodeTemplateMap.add("Truth", TruthTemplate);
+		
+		myDiagram.nodeTemplateMap.add("FreehandDrawing",
+      $(go.Part,
+        { locationSpot: go.Spot.Center, isLayoutPositioned: false },
+        new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+        {
+          selectionAdorned: true, selectionObjectName: "SHAPE",
+          selectionAdornmentTemplate:  // custom selection adornment: a blue rectangle
+            $(go.Adornment, "Auto",
+              $(go.Shape, { stroke: "dodgerblue", fill: null }),
+              $(go.Placeholder, { margin: -1 }))
+        },
+        { resizable: true, resizeObjectName: "SHAPE" },
+        { rotatable: true, rotateObjectName: "SHAPE" },
+        { reshapable: true },  // GeometryReshapingTool assumes nonexistent Part.reshapeObjectName would be "SHAPE"
+        $(go.Shape,
+          { name: "SHAPE", fill: null, strokeWidth: 1.5 },
+          new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+          new go.Binding("angle").makeTwoWay(),
+          new go.Binding("geometryString", "geo").makeTwoWay(),
+          new go.Binding("fill"),
+          new go.Binding("stroke"),
+          new go.Binding("strokeWidth"))
+      ));
+
+    // create drawing tool for myDiagram, defined in FreehandDrawingTool.js
+    var tool = new FreehandDrawingTool();
+    // provide the default JavaScript object for a new polygon in the model
+    tool.archetypePartData =
+      { stroke: "blue", strokeWidth: 4, category: "FreehandDrawing" };
+    // allow the tool to start on top of an existing Part
+    tool.isBackgroundOnly = false;
+    // install as first mouse-move-tool
+   myDiagram.toolManager.mouseMoveTools.insertAt(0, tool);
+mode(false);
+    load();  // load a simple diagram from the textarea
+  
       // share the template map with the Palette
       palette.nodeTemplateMap = myDiagram.nodeTemplateMap;
       palette.model.nodeDataArray = [
@@ -658,8 +741,8 @@ initialScale: 1.5,
         { category: "AND gate" },
         { category: "OR gate" },		
 		{ category: "Buzzer" },
-		{ category: "Relay" },{category: "Slide_Switch" },
-		{ category: "Motor" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Label",text: "Label Here" },{ category: "Battery" },{ category: "Batt" },{ category: "Truth" },
+		{ category: "Relay" },
+		{ category: "Motor" },{category: "Slide_Switch" },{ category: "NAND gate" },{ category: "NOR gate" },{ category: "XOR gate" },{ category: "XNOR gate" },{ category: "Label",text: "Label Here" },{ category: "Battery" },{ category: "Batt" },{ category: "Truth" },{ category: "Inputs" },
       ];
  
       // load the initial diagram
@@ -681,6 +764,9 @@ initialScale: 1.5,
             doInput(node);
           }
 		            if (node.category === "Slide_Switch") {
+            doInput(node);
+          }
+              if (node.category === "Inputs") {
             doInput(node);
           }
 		            if (node.category === "Temp_Sensor") {
@@ -711,7 +797,8 @@ initialScale: 1.5,
 						case "Battery":	doBattery1(node); break;
                   case "Batt":	doBatt(node); break;
 						case "Motor":	doMotor(node); break; 
-                  case "Truth": break;// doInput already called, above
+                  case "Truth": break;
+                  case "Inputs": break;// doInput already called, above
           }
         });
       myDiagram.skipsUndoManager = oldskip;
@@ -801,7 +888,7 @@ initialScale: 1.5,
       setOutputLinks(node, color);
 	  node.findObject("NODESHAPE").fill = color;
 	  	  var buzzSound = new Audio('./assets/Buzz.mp3');
-buzzSound.loop = false;if (color === green) {
+buzzSound.loop = true;if (color === green) {
         buzzSound.play()}
 		buzzSound.loop = false;if (color === red) {
         buzzSound.pause()}
@@ -816,7 +903,7 @@ buzzSound.loop = false;if (color === green) {
 	  });
 	   
       setOutputLinks(node, colour);
-	  node.findObject("NODESHAPE").fill = colour;
+	  node.findObject("NODESHAPE").fill = colour
     }
 	
 	
@@ -867,12 +954,79 @@ motorSound.loop = false;if (colour2 === green) {
     
 	 document.getElementById("blobButton").addEventListener("click", makeBlob);
   }
+        function loadAND() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("ANDPage").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+    
+    function loadOR() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("ORPage").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+      function loadLatch1() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Latch1").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+        function loadLatch2() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Latch2").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+        function loadLatch3() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Latch3").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+          function loadComb1() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb1").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+            function loadComb2() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb2").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+            function loadComb3() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb3").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+            function loadComb4() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb4").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+            function loadComb5() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb5").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+            function loadComb6() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Comb6").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+              function loadProblem1() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Problem1").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+                  function loadHelp() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Help").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+    
+    function mode(draw) {
+    var tool = myDiagram.toolManager.findTool("FreehandDrawing");
+    tool.isEnabled = draw;
+  }
 
-  // When the blob is complete, make an anchor tag for it and use the tag to initiate a download
-  // Works in:
-  // * Chrome
-  // * IE11, Edge
-  // * Firefox
+
   function myCallback(blob) {
     var url = window.URL.createObjectURL(blob);
     var filename = "Solution.png";
@@ -909,51 +1063,429 @@ motorSound.loop = false;if (colour2 === green) {
 <body onload="init()">
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
-    <span style="display: inline-block; vertical-align: top; width:285px">
-      <div id="palette" style="border: solid 1px black; height: 965px"></div>
+    <span style="display: inline-block; vertical-align: top; width:320px">
+      <div id="palette" style="border: solid 1px black; height: 1020px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width: 85%">
-      <div id="myDiagramDiv" style="border: solid 1px black; height: 965px"></div>
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 1020px"></div>
     </span>
   </div>
-  <p>&nbsp;</p>
-<</p> <button id="saveModel" onclick="save()">Save</button> <button id="blobButton">Save Image Solution</button>
+  <p>
       
     </div>
-    <textarea id="mySavedModel" style="width:100%;height:0px">
-
+    <textarea id="mySavedModel" style="width:100%;height:12px">
 { "class": "go.GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
-  "nodeDataArray": [
-{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -250" },
-{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120" },
-{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20" },
-{"category":"Switch", "key":"Switch1", "loc":"-280 80" },
-
-        {"category":"Label", "loc":"-385 -210", "text":"Slide Switch"},
-        {"category":"Label", "loc":"-410 -100", "text":"Light Sensor"},
-        {"category":"Label", "loc":"-425 0", "text":"Temp Sensor"},
-        {"category":"Label", "loc":"-385 100", "text":"Push Switch"},
-        
-{"category":"NOT gate", "key":"NOT1", "loc":"-45 -230" },
-{"category":"AND gate", "key":"AND1", "loc":"-45 -90" },
-{"category":"OR gate", "key":"OR1", "loc":"-40 60" },
-
-{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -235" },
-{"category":"Relay", "key":"Relay1", "loc":"220 -80" },
-{"category":"Lamp", "key":"Lamp1", "loc":"220 80" },
-        
-                {"category":"Label", "loc":"230 -265", "text":"Buzzer"},
-        {"category":"Label", "loc":"235 -108", "text":"Relay"},
-        {"category":"Label", "loc":"235 52", "text":"Lamp"}
+  "nodeDataArray": [ 
+{"category":"Label", "loc":"-427.9648437499999 -220.00000000000003", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-420.2656250000001 -100.00000000000003", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-425 0", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-421.59374999999983 99.99999999999993", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-49.99999999999996 -190"},
+{"category":"AND gate", "key":"AND1", "loc":"-49.999999999999986 -70"},
+{"category":"OR gate", "key":"OR1", "loc":"-44.599999999999994 71.99999999999997"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220.0000000000001 -189.99999999999997"},
+{"category":"Relay", "key":"Relay1", "loc":"230 -70"},
+{"category":"Lamp", "key":"Lamp1", "loc":"213.23593750000012 72.00000000000001"},
+{"category":"Label", "loc":"230 -240.16328125000004", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"220 -120", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"219.99999999999997 21.83671874999999", "text":"Lamp", "key":-17},
+{"category":"Slide_Switch", "key":-18, "loc":"-315.475 -210"},
+{"category":"Light_Sensor", "key":-1, "loc":"-315.475 -100"},
+{"category":"Temp_Sensor", "key":-3, "loc":"-315.475 0"},
+{"category":"Switch", "key":-4, "loc":"-315.475 100"}
  ],
- "linkDataArray": [
-{"from":"Light_Sens0", "fromPort":"out0", "to":"NOT01", "toPort":"in"},
-{"from":"NO0", "fromPort":"out0", "to":"Lamp01", "toPort":"in"}
-
+  "linkDataArray": []}
+    </textarea>
+    <textarea id="ANDPage" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-260 -70"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-280 30"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-300 130"},
+{"category":"Switch", "key":"Switch1", "loc":"-250 250"},
+{"category":"Label", "loc":"-370 -60", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-390 50", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-410 150", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-360 260", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-30 -70"},
+{"category":"AND gate", "key":"AND1", "loc":"-30 60"},
+{"category":"OR gate", "key":"OR1", "loc":"-10 210"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"230 -70"},
+{"category":"Relay", "key":"Relay1", "loc":"250 60"},
+{"category":"Lamp", "key":"Lamp1", "loc":"240 230"},
+{"category":"Label", "loc":"240 -120", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"240 10", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"250 180", "text":"Lamp", "key":-17},
+{"category":"Truth", "key":-19, "loc":"-90 -220", "text":"Temp Sensor"},
+{"category":"Truth", "key":-20, "loc":"280 -220", "text":"Lamp"},
+{"category":"Truth", "key":-21, "loc":"120 -220", "text":"Push Switch"}
+ ],
+  "linkDataArray": [ 
+{"from":"AND1", "to":"Buzzer1", "fromPort":"out", "toPort":"", "points":[ 11.799999999999997,60,21.799999999999997,60,20,60,20,60,36,60,36,-70,177.20000000000002,-70,187.20000000000002,-70 ]},
+{"from":"Temp_Sensor1", "to":"AND1", "fromPort":"", "toPort":"in1", "points":[ -267.59999999999997,130,-257.59999999999997,130,-260,130,-260,130,-220,130,-220,45.599999999999994,-99.72,45.599999999999994,-89.72,45.599999999999994 ]},
+{"from":"Switch1", "to":"AND1", "fromPort":"", "toPort":"in2", "points":[ -217.59999999999997,250,-207.59999999999997,250,-204,250,-204,74.4,-99.72,74.4,-89.72,74.4 ]}
  ]}
- 
+    </textarea>
+    <textarea id="ORPage" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-260 -70"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-280 30"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-300 130"},
+{"category":"Switch", "key":"Switch1", "loc":"-280 260"},
+{"category":"Label", "loc":"-370 -60", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-390 50", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-410 150", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-390 260", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-30 -70"},
+{"category":"AND gate", "key":"AND1", "loc":"-30 60"},
+{"category":"OR gate", "key":"OR1", "loc":"-10 210"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"140 -70"},
+{"category":"Relay", "key":"Relay1", "loc":"160 60"},
+{"category":"Lamp", "key":"Lamp1", "loc":"150 230"},
+{"category":"Label", "loc":"150 -120", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"150 10", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"150 180", "text":"Lamp", "key":-17},
+{"category":"Truth", "key":-19, "loc":"-90 -220", "text":"Slide Switch"},
+{"category":"Truth", "key":-20, "loc":"280 -220", "text":"Lamp"},
+{"category":"Truth", "key":-21, "loc":"120 -220", "text":"Push Switch"}
+ ],
+  "linkDataArray": [ 
+{"from":"Switch1", "to":"OR1", "fromPort":"", "toPort":"in2", "points":[-247.59999999999997,260,-237.59999999999997,260,-236,260,-236,260,-220,260,-220,224.4,-74.32000000000001,224.4,-64.32000000000001,224.4]},
+{"from":"OR1", "to":"Lamp1", "fromPort":"out", "toPort":"", "points":[26.39999999999999,210,36.39999999999999,210,36,210,36,210,52,210,52,230,97.2,230,107.2,230]},
+{"from":"Slide_Switch1", "to":"OR1", "fromPort":"", "toPort":"in1", "points":[-227.59999999999997,-70,-217.59999999999997,-70,-217.59999999999997,-70,-217.59999999999997,195.6,-74.32000000000001,195.6,-64.32000000000001,195.6]}
+ ]}
+    </textarea>
+    <textarea id="Latch1" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -220"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20"},
+{"category":"Switch", "key":"Switch1", "loc":"-280 80"},
+{"category":"Label", "loc":"-385 -210", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-410 -100", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-425 0", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-385 100", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-50 -220"},
+{"category":"AND gate", "key":"AND1", "loc":"-45 -90"},
+{"category":"OR gate", "key":"OR1", "loc":"-40 30"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -210"},
+{"category":"Relay", "key":"Relay1", "loc":"230 -70"},
+{"category":"Lamp", "key":"Lamp1", "loc":"220 80"},
+{"category":"Label", "loc":"230 -260", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"220 -120", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"230 30", "text":"Lamp", "key":-17}
+ ],
+  "linkDataArray": [ 
+{"from":"Switch1", "to":"Lamp1", "fromPort":"", "toPort":"", "points":[-247.59999999999997,80,-237.59999999999997,80,-237.59999999999997,80,-237.59999999999997,80,167.20000000000002,80,177.20000000000002,80]},
+{"from":"Switch1", "to":"Buzzer1", "fromPort":"", "toPort":"", "points":[-247.59999999999997,80,-237.59999999999997,80,151.99999999999994,80,151.99999999999994,-98,151.99999999999994,-98,151.99999999999994,-210,167.20000000000002,-210,177.20000000000002,-210]}
+ ]}
+    </textarea>
+            <textarea id="Latch2" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -220"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20"},
+{"category":"Switch", "key":"Switch1", "loc":"-290 80"},
+{"category":"Label", "loc":"-385 -210", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-410 -100", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-425 0", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-385 100", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-50 -220"},
+{"category":"AND gate", "key":"AND1", "loc":"-45 -90"},
+{"category":"OR gate", "key":"OR1", "loc":"-40 70"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -210"},
+{"category":"Relay", "key":"Relay1", "loc":"230 -70"},
+{"category":"Lamp", "key":"Lamp1", "loc":"220 70"},
+{"category":"Label", "loc":"230 -260", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"220 -120", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"230 20", "text":"Lamp", "key":-17}
+ ],
+  "linkDataArray": [ 
+{"from":"Switch1", "to":"OR1", "fromPort":"", "toPort":"in2", "points":[-257.59999999999997,80,-247.59999999999997,80,-247.59999999999997,84.4,-247.59999999999997,84.4,-104.32000000000001,84.4,-94.32000000000001,84.4]},
+{"from":"OR1", "to":"OR1", "fromPort":"out", "toPort":"in1", "points":[-3.6000000000000085,70,6.3999999999999915,70,6.3999999999999915,4,-104.32000000000001,4,-104.32000000000001,55.599999999999994,-94.32000000000001,55.599999999999994]},
+{"from":"OR1", "to":"Lamp1", "fromPort":"out", "toPort":"", "points":[-3.6000000000000085,70,6.3999999999999915,70,6.3999999999999915,70,6.3999999999999915,70,167.20000000000002,70,177.20000000000002,70]},
+{"from":"OR1", "to":"Buzzer1", "fromPort":"out", "toPort":"", "points":[-3.6000000000000085,70,6.3999999999999915,70,147.33333333333331,70,147.33333333333331,-210,167.20000000000002,-210,177.20000000000002,-210]}
+ ]}
+
+    </textarea>
+            <textarea id="Latch3" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -220"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20"},
+{"category":"Switch", "key":"Switch1", "loc":"-290 80"},
+{"category":"Label", "loc":"-410 -230", "text":"Set/Reset Switch", "key":-11},
+{"category":"Label", "loc":"-410 -100", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-425 0", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-385 100", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-50 -220"},
+{"category":"AND gate", "key":"AND1", "loc":"-45 -90"},
+{"category":"OR gate", "key":"OR1", "loc":"-40 70"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -210"},
+{"category":"Relay", "key":"Relay1", "loc":"230 -70"},
+{"category":"Lamp", "key":"Lamp1", "loc":"220 70"},
+{"category":"Label", "loc":"230 -260", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"220 -120", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"230 20", "text":"Lamp", "key":-17}
+ ],
+  "linkDataArray": [ 
+{"from":"Switch1", "to":"OR1", "fromPort":"", "toPort":"in2", "points":[-257.59999999999997,80,-247.59999999999997,80,-247.59999999999997,84.4,-247.59999999999997,84.4,-104.32000000000001,84.4,-94.32000000000001,84.4]},
+{"from":"OR1", "to":"Lamp1", "fromPort":"out", "toPort":"", "points":[-3.6000000000000085,70,6.3999999999999915,70,6.3999999999999915,70,6.3999999999999915,70,167.20000000000002,70,177.20000000000002,70]},
+{"from":"OR1", "to":"Buzzer1", "fromPort":"out", "toPort":"", "points":[-3.6000000000000085,70,6.3999999999999915,70,149.99999999999994,70,149.99999999999994,-210,167.20000000000002,-210,177.20000000000002,-210]},
+{"from":"OR1", "to":"AND1", "fromPort":"out", "toPort":"in2", "points":[-3.6000000000000085,70,6.3999999999999915,70,6.3999999999999915,-26.666666666666686,-114.72,-26.666666666666686,-114.72,-75.6,-104.72,-75.6]},
+{"from":"AND1", "to":"OR1", "fromPort":"out", "toPort":"in1", "points":[-3.200000000000003,-90,6.799999999999997,-90,31.333333333333314,-90,31.333333333333314,-8.666666666666686,-166,-8.666666666666686,-166,55.599999999999994,-104.32000000000001,55.599999999999994,-94.32000000000001,55.599999999999994]},
+{"from":"Slide_Switch1", "to":"AND1", "fromPort":"", "toPort":"in1", "points":[-247.59999999999997,-220,-237.59999999999997,-220,-236,-220,-236,-104.4,-114.72,-104.4,-104.72,-104.4]}
+ ]}
+
+    </textarea>
+    <textarea id="Comb1" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-320 -150"},
+{"category":"Inputs", "key":-2, "loc":"-320 -10", "text":"B"},
+{"category":"NOT gate", "key":-5, "loc":"-130 -150"},
+{"category":"AND gate", "key":-6, "loc":"60 -60"},
+{"category":"Truth", "key":-19, "loc":"-120 -310", "text":"A"},
+{"category":"Truth", "key":-7, "loc":"-80 -310", "text":"B"},
+{"category":"Truth", "key":-8, "loc":"-20 -310", "text":"Y"},
+{"category":"Truth", "key":-9, "loc":"40 -310", "text":"Z"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-80 -170"},
+{"category":"Lamp", "key":-10, "loc":"190 -60"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"130 -90"}
+ ],
+  "linkDataArray": [ 
+{"from":-20, "to":-5, "fromPort":"", "toPort":"in", "points":[-289.40000000000003,-150,-279.40000000000003,-150,-279.40000000000003,-150,-279.40000000000003,-150,-199.72000000000003,-150,-189.72000000000003,-150]},
+{"from":-2, "to":-6, "fromPort":"", "toPort":"in2", "points":[-289.40000000000003,-10,-279.40000000000003,-10,-276,-10,-276,-10,-260,-10,-260,-45.6,-9.719999999999999,-45.6,0.28000000000000114,-45.6]},
+{"from":-5, "to":-6, "fromPort":"out", "toPort":"in1", "points":[-88.20000000000002,-150,-78.20000000000002,-150,-76,-150,-76,-74.4,-9.719999999999999,-74.4,0.28000000000000114,-74.4]},
+{"from":-6, "to":-10, "fromPort":"out", "toPort":"", "points":[101.8,-60,111.8,-60,111.8,-60,111.8,-60,137.20000000000002,-60,147.20000000000002,-60]}
+ ]}
+
+    </textarea>
+       <textarea id="Comb2" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-320 -150"},
+{"category":"Inputs", "key":-2, "loc":"-320 -10", "text":"B"},
+{"category":"NOT gate", "key":-5, "loc":"40 -60"},
+{"category":"AND gate", "key":-6, "loc":"-110 -60"},
+{"category":"Truth", "key":-19, "loc":"-120 -310"},
+{"category":"Truth", "key":-7, "loc":"-80 -310", "text":"B"},
+{"category":"Truth", "key":-8, "loc":"-20 -310", "text":"Y"},
+{"category":"Truth", "key":-9, "loc":"40 -310", "text":"Z"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-60 -90"},
+{"category":"Lamp", "key":-10, "loc":"190 -60"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"120 -80"}
+ ],
+  "linkDataArray": [ 
+{"from":-6, "to":-5, "fromPort":"out", "toPort":"in", "points":[ -68.20000000000002,-60,-58.20000000000002,-60,-58.20000000000002,-60,-58.20000000000002,-60,-29.72,-60,-19.72,-60 ]},
+{"from":-5, "to":-10, "fromPort":"out", "toPort":"", "points":[ 81.8,-60,91.8,-60,91.8,-60,91.8,-60,137.20000000000002,-60,147.20000000000002,-60 ]},
+{"from":-20, "to":-6, "fromPort":"", "toPort":"in1", "points":[ -289.40000000000003,-150,-279.40000000000003,-150,-276,-150,-276,-74.4,-179.72000000000003,-74.4,-169.72000000000003,-74.4 ]},
+{"from":-2, "to":-6, "fromPort":"", "toPort":"in2", "points":[ -289.40000000000003,-10,-279.40000000000003,-10,-276,-10,-276,-10,-260,-10,-260,-45.6,-179.72000000000003,-45.6,-169.72000000000003,-45.6 ]}
+ ]}
+
+    </textarea>
+       <textarea id="Comb3" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-320 -150"},
+{"category":"Inputs", "key":-2, "loc":"-320 -10", "text":"B"},
+{"category":"NOT gate", "key":-5, "loc":"-170 -150"},
+{"category":"Truth", "key":-19, "loc":"-120 -310"},
+{"category":"Truth", "key":-7, "loc":"-80 -310", "text":"B"},
+{"category":"Truth", "key":-8, "loc":"-20 -310", "text":"Y"},
+{"category":"Truth", "key":-9, "loc":"40 -310", "text":"Z"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-130 -170"},
+{"category":"Lamp", "key":-10, "loc":"160 -60"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"90 -80"},
+{"category":"OR gate", "key":-12, "loc":"30 -60"}
+ ],
+  "linkDataArray": [ 
+{"from":-20, "to":-5, "fromPort":"", "toPort":"in", "points":[-289.40000000000003,-150,-279.40000000000003,-150,-279.40000000000003,-150,-279.40000000000003,-150,-239.72000000000003,-150,-229.72000000000003,-150]},
+{"from":-5, "to":-12, "fromPort":"out", "toPort":"in1", "points":[-128.20000000000002,-150,-118.20000000000002,-150,-116,-150,-116,-74.4,-34.32,-74.4,-24.32,-74.4]},
+{"from":-2, "to":-12, "fromPort":"", "toPort":"in2", "points":[-289.40000000000003,-10,-279.40000000000003,-10,-276,-10,-276,-10,-260,-10,-260,-45.6,-34.32,-45.6,-24.32,-45.6]},
+{"from":-12, "to":-10, "fromPort":"out", "toPort":"", "points":[66.4,-60,76.4,-60,76.4,-60,76.4,-60,107.2,-60,117.2,-60]}
+ ]}
+
+    </textarea>
+       <textarea id="Comb4" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-310 -160"},
+{"category":"Inputs", "key":-2, "loc":"-310 -60", "text":"B"},
+{"category":"NOT gate", "key":-5, "loc":"30 -110"},
+{"category":"Truth", "key":-19, "loc":"-120 -310"},
+{"category":"Truth", "key":-7, "loc":"-80 -310", "text":"B"},
+{"category":"Truth", "key":-8, "loc":"-20 -310", "text":"Y"},
+{"category":"Truth", "key":-9, "loc":"40 -310", "text":"Z"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-70 -130"},
+{"category":"Lamp", "key":-10, "loc":"160 -110"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"90 -130"},
+{"category":"OR gate", "key":-12, "loc":"-120 -110"}
+ ],
+  "linkDataArray": [ 
+{"from":-5, "to":-10, "fromPort":"out", "toPort":"", "points":[71.8,-110,81.8,-110,81.8,-110,81.8,-110,107.2,-110,117.2,-110]},
+{"from":-12, "to":-5, "fromPort":"out", "toPort":"in", "points":[-83.60000000000001,-110,-73.60000000000001,-110,-73.60000000000001,-110,-73.60000000000001,-110,-39.72,-110,-29.72,-110]},
+{"from":-2, "to":-12, "fromPort":"", "toPort":"in2", "points":[-279.4000000000002,-59.99999999999997,-269.4000000000002,-59.99999999999997,-268,-59.99999999999997,-268,-59.99999999999997,-252,-59.99999999999997,-252,-95.6,-184.32,-95.6,-174.32,-95.6]},
+{"from":-20, "to":-12, "fromPort":"", "toPort":"in1", "points":[-279.40000000000015,-160.00000000000014,-269.40000000000015,-160.00000000000014,-268,-160.00000000000014,-268,-160.00000000000014,-252,-160.00000000000014,-252,-124.4,-184.32,-124.4,-174.32,-124.4]}
+ ]}
+
+    </textarea>
+       <textarea id="Comb5" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-300 -170"},
+{"category":"Inputs", "key":-2, "loc":"-300 -60", "text":"B"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-110 -130"},
+{"category":"Lamp", "key":-10, "loc":"100 -100"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"30 -120"},
+{"category":"OR gate", "key":-12, "loc":"-170 -110"},
+{"category":"AND gate", "key":-6, "loc":"-20 -100"},
+{"category":"Inputs", "key":-13, "loc":"-300 40", "text":"C"},
+{"category":"Truth", "key":-19, "loc":"170 -140", "text":" "},
+{"category":"Truth", "key":-14, "loc":"200 -140", "text":" "},
+{"category":"Truth", "key":-15, "loc":"230 -140", "text":" "},
+{"category":"Truth", "key":-17, "loc":"290 -140", "text":" "},
+{"category":"Truth", "key":-18, "loc":"170 -280", "text":"A"},
+{"category":"Truth", "key":-21, "loc":"200 -280", "text":"B"},
+{"category":"Truth", "key":-22, "loc":"230 -280", "text":"C"},
+{"category":"Truth", "key":-23, "loc":"290 -280", "text":"Y"},
+{"category":"Truth", "key":-24, "loc":"340 -140", "text":" "},
+{"category":"Truth", "key":-25, "loc":"340 -280", "text":"Z"}
+ ],
+  "linkDataArray": [ 
+{"from":-2, "to":-12, "fromPort":"", "toPort":"in2", "points":[ -269.40000000000003,-60,-259.40000000000003,-60,-260,-60,-260,-60,-244,-60,-244,-95.6,-234.32,-95.6,-224.32,-95.6 ]},
+{"from":-20, "to":-12, "fromPort":"", "toPort":"in1", "points":[ -269.4000000000002,-169.99999999999994,-259.4000000000002,-169.99999999999994,-259.4000000000002,-169.99999999999994,-259.4000000000002,-124.4,-234.32,-124.4,-224.32,-124.4 ]},
+{"from":-13, "to":-6, "fromPort":"", "toPort":"in2", "points":[ -269.40000000000003,40,-259.40000000000003,40,-260,40,-260,40,-108,40,-108,-85.6,-89.72,-85.6,-79.72,-85.6 ]},
+{"from":-6, "to":-10, "fromPort":"out", "toPort":"", "points":[ 21.799999999999997,-100,31.799999999999997,-100,39.5,-100,39.5,-100,47.199999999999996,-100,57.199999999999996,-100 ]},
+{"from":-12, "to":-6, "fromPort":"out", "toPort":"in1", "points":[ -133.60000000000002,-110,-123.60000000000002,-110,-124,-110,-124,-110,-92,-110,-92,-114.4,-89.72,-114.4,-79.72,-114.4 ]}
+ ]}
+
+    </textarea>
+       <textarea id="Comb6" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Inputs", "key":-20, "loc":"-290 -180"},
+{"category":"Inputs", "key":-2, "loc":"-300 -60", "text":"B"},
+{"category":"Label", "text":"Y", "key":-16, "loc":"-110 -130"},
+{"category":"Lamp", "key":-10, "loc":"100 -100"},
+{"category":"Label", "text":"Z", "key":-11, "loc":"30 -120"},
+{"category":"OR gate", "key":-12, "loc":"-20 -100"},
+{"category":"AND gate", "key":-6, "loc":"-160 -110"},
+{"category":"Inputs", "key":-13, "loc":"-300 40", "text":"C"},
+{"category":"Truth", "key":-18, "loc":"180 -330", "text":"A"},
+{"category":"Truth", "key":-21, "loc":"210 -330", "text":"B"},
+{"category":"Truth", "key":-22, "loc":"240 -330", "text":"C"},
+{"category":"Truth", "key":-23, "loc":"300 -330", "text":"Y"},
+{"category":"Truth", "key":-25, "loc":"350 -330", "text":"Z"},
+{"category":"Truth", "key":-19, "loc":"180 -190", "text":" "},
+{"category":"Truth", "key":-14, "loc":"210 -190", "text":" "},
+{"category":"Truth", "key":-15, "loc":"240 -190", "text":" "},
+{"category":"Truth", "key":-17, "loc":"300 -190", "text":" "},
+{"category":"Truth", "key":-24, "loc":"350 -190", "text":" "}
+ ],
+  "linkDataArray": [ 
+{"from":-6, "to":-12, "fromPort":"out", "toPort":"in1", "points":[ -118.20000000000002,-110,-108.20000000000002,-110,-108,-110,-108,-110,-92,-110,-92,-114.4,-84.32000000000001,-114.4,-74.32000000000001,-114.4 ]},
+{"from":-20, "to":-6, "fromPort":"", "toPort":"in1", "points":[ -259.40000000000026,-180.00000000000006,-249.40000000000026,-180.00000000000006,-249.40000000000026,-180.00000000000006,-249.40000000000026,-124.4,-229.72000000000003,-124.4,-219.72000000000003,-124.4 ]},
+{"from":-2, "to":-6, "fromPort":"", "toPort":"in2", "points":[ -269.40000000000003,-60,-259.40000000000003,-60,-260,-60,-260,-60,-244,-60,-244,-95.6,-229.72000000000003,-95.6,-219.72000000000003,-95.6 ]},
+{"from":-13, "to":-12, "fromPort":"", "toPort":"in2", "points":[ -269.40000000000003,40,-259.40000000000003,40,-260,40,-260,40,-92,40,-92,-85.6,-84.32000000000001,-85.6,-74.32000000000001,-85.6 ]},
+{"from":-12, "to":-10, "fromPort":"out", "toPort":"", "points":[ 16.39999999999999,-100,26.39999999999999,-100,26.39999999999999,-100,26.39999999999999,-100,47.199999999999996,-100,57.199999999999996,-100 ]}
+ ]}
+
+    </textarea>
+       <textarea id="Problem1" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-280 -220"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-300 -120"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-320 -20"},
+{"category":"Switch", "key":"Switch1", "loc":"-280 80"},
+{"category":"Label", "loc":"-385 -210", "text":"Slide Switch", "key":-11},
+{"category":"Label", "loc":"-410 -100", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-425 0", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-385 100", "text":"Push Switch", "key":-14},
+{"category":"NOT gate", "key":"NOT1", "loc":"-50 -220"},
+{"category":"AND gate", "key":"AND1", "loc":"-45 -90"},
+{"category":"OR gate", "key":"OR1", "loc":"-40 60"},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"220 -210"},
+{"category":"Relay", "key":"Relay1", "loc":"230 -70"},
+{"category":"Lamp", "key":"Lamp1", "loc":"220 80"},
+{"category":"Label", "loc":"230 -260", "text":"Buzzer", "key":-15},
+{"category":"Label", "loc":"220 -120", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"230 30", "text":"Lamp", "key":-17}
+ ],
+  "linkDataArray": [ 
+{"from":"Slide_Switch1", "to":"AND1", "fromPort":"", "toPort":"in2", "points":[-247.59999999999997,-220,-237.59999999999997,-220,-208,-220,-208,-75.6,-114.72,-75.6,-104.72,-75.6]},
+{"from":"Light_Sensor1", "to":"NOT1", "fromPort":"", "toPort":"in", "points":[-267.59999999999997,-120,-257.59999999999997,-120,-260,-120,-260,-119.33333333333331,-164.66666666666669,-119.33333333333331,-164.66666666666669,-220,-119.72,-220,-109.72,-220]},
+{"from":"NOT1", "to":"AND1", "fromPort":"out", "toPort":"in1", "points":[-8.200000000000003,-220,1.7999999999999972,-220,4,-220,4,-172,-116,-172,-116,-104.4,-114.72,-104.4,-104.72,-104.4]},
+{"from":"AND1", "to":"Lamp1", "fromPort":"out", "toPort":"", "points":[-3.200000000000003,-90,6.799999999999997,-90,4,-90,4,-90,28,-90,28,80,167.20000000000002,80,177.20000000000002,80]}
+ ]}
+    </textarea>   <textarea id="Help" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Slide_Switch", "key":"Slide_Switch1", "loc":"-710 -510"},
+{"category":"Light_Sensor", "key":"Light_Sensor1", "loc":"-680 -430"},
+{"category":"Temp_Sensor", "key":"Temp_Sensor1", "loc":"-680 -340"},
+{"category":"Switch", "key":"Switch1", "loc":"-620 -510"},
+{"category":"Label", "loc":"-810 -510", "text":"Switches", "key":-11},
+{"category":"Label", "loc":"-790 -430", "text":"Light Sensor", "key":-12},
+{"category":"Label", "loc":"-790 -340", "text":"Temp Sensor", "key":-13},
+{"category":"Label", "loc":"-650 -590", "text":"Pressing Fn+F11 on the keyboard will toggle fullscreen mode.", "key":-14},
+{"category":"Buzzer", "key":"Buzzer1", "loc":"-660 -140"},
+{"category":"Relay", "key":"Relay1", "loc":"-720 -250"},
+{"category":"Lamp", "key":"Lamp1", "loc":"-570 -140"},
+{"category":"Label", "loc":"-780 -140", "text":"Buzzer and Lamp", "key":-15},
+{"category":"Label", "loc":"-810 -250", "text":"Relay", "key":-16},
+{"category":"Label", "loc":"-440 -430", "text":"Double clicking will toggle LIGHT/ON (WHITE) and DARK/OFF (GREEN)", "key":-19},
+{"category":"Label", "loc":"-400 -520", "text":"Double clicking will toggle ON (RED) and OFF (GREEN)", "key":-20},
+{"category":"Label", "loc":"-460 -350", "text":"Double clicking will toggle\nWARM/ON (RED) and COLD/OFF (BLUE)", "key":-21},
+{"category":"Label", "loc":"-340 -140", "text":"A HIGH signal(RED) will turn on the OUTPUTS\nBuzzer - RED      LAMP - YELLOW", "key":-22},
+{"category":"Label", "loc":"-470 -250", "text":"A HIGH signal(RED) will turn ON the RELAY\nIf a HIGH signal (RED) is connected to the TOP terminal and the RELAY is ON, then a HIGH signal will come out of the bottom terminal.", "key":-23},
+{"category":"Motor", "key":-24, "loc":"-170 -520"},
+{"category":"Label", "loc":"40 -520", "text":"If either terminal is connected to\nBLACK or GREEN (LOW) \nAND the other connected to RED (HIGH)\n then the Motor will turn ON (RED).", "key":-25},
+{"category":"Label", "text":"Label Here", "key":-26, "loc":"-170 -430"},
+{"category":"Label", "text":"Label Here will allow you to type text to label/describe points of interest.", "key":-27, "loc":"40 -440"},
+{"category":"Battery", "key":-28, "loc":"-160 -340"},
+{"category":"Batt", "key":-29, "loc":"-160 -240"},
+{"category":"Label", "text":"Positive terminal of a Battery supply", "key":-30, "loc":"30 -340"},
+{"category":"Label", "text":"Negative terminal of a Battery supply", "key":-31, "loc":"30 -240"},
+{"category":"Inputs", "key":-32, "loc":"-740 -50"},
+{"category":"Label", "text":"Allows Inputs to be labelled with letters", "key":-33, "loc":"-530 -50"},
+{"category":"Truth", "key":-34, "loc":"-130 -100"},
+{"category":"Label", "text":"Allows Truth Tables to be created; \nPress each character to change options.", "key":-35, "loc":"50 -130"}
+ ],
+  "linkDataArray": []}
     </textarea>
   </div>
 
