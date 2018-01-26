@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><link rel="shortcut icon" href="./assets/RGC.png" type="image/x-icon" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RGC MFA Board</title>
 <meta name="description" content="A simple logic circuit editor and simulator." />
@@ -11,10 +11,10 @@
 <script src="./extensions/TextEditorRadioButtons.js"></script>
   <link rel='stylesheet' href='./extensions/LightBoxContextMenu.css' />
 <script src="./extensions/FreehandDrawingTool.js"></script>
-<script src="./assets/js/GuidedDraggingTool.js"></script> D McLaren
- 
- &nbsp;<!--<button id="saveModel" onclick="save()">Save</button><button id="loadModel" onclick="load()">Load</button>-->  <button id="blobButton">Save As .PNG</button> <!--  <button onclick="mode(true)">Draw Mode</button>   <button onclick="mode(false)">Select</button>   <button onclick="load()">Decisions</button>   <button onclick="loadAND()">AND gate</button>  <button onclick="loadOR()">OR gate</button>  <button onclick="loadLatch1()">Latch1</button>  <button onclick="loadLatch2()">Latch2</button>  <button onclick="loadLatch3()">Latch3</button>  <button onclick="loadComb1()">Combination1</button>  <button onclick="loadComb2()">Combination2</button>  <button onclick="loadComb3()">Combination3</button>  <button onclick="loadComb4()">Combination4</button>  <button onclick="loadComb5()">Combination5</button>  <button onclick="loadComb6()">Combination6</button>  <button onclick="loadProblem1()">Eg. Problem</button>-->       <button onclick="loadHelp()">Help</button>
   <script src="./extensions/LightBoxContextMenu.js"></script> 
+<script src="./assets/js/GuidedDraggingTool.js"></script> D McLaren
+ &nbsp; <button id="blobButton">Save As .PNG</button>   <button onclick="loadTraffic()">Traffic Lights</button>     <button onclick="loadHelp()">Help</button>
+
 <script id="code">
   
     var red = "forestgreen";  // 0 or false
@@ -33,14 +33,13 @@
         $(go.Diagram, "myDiagramDiv",  // create a new Diagram in the HTML DIV element "myDiagramDiv"
           {	
 initialScale: 1.5,
-            initialContentAlignment: go.Spot.Left,
+            initialContentAlignment: go.Spot.LeftCenter,
             
-            allowDrop: true, 
-			initialContentAlignment: go.Spot.Center,  // center the content
+            allowDrop: true,   // center the content
                     draggingTool: new GuidedDraggingTool(),  // defined in GuidedDraggingTool.js
-                    "draggingTool.horizontalGuidelineColor": "blue",
+                    "draggingTool.horizontalGuidelineColor": "green",
                     "draggingTool.verticalGuidelineColor": "blue",
-                    "draggingTool.centerGuidelineColor": "green",
+                    "draggingTool.centerGuidelineColor": "red",
                     "draggingTool.guidelineWidth": 1, // Nodes from the Palette can be dropped into the Diagram
             "draggingTool.isGridSnapEnabled": true,  // dragged nodes will snap to a grid of 10x10 cells
             "undoManager.isEnabled": true
@@ -946,11 +945,17 @@ motorSound.loop = false;if (colour2 === green) {
 
   }
      function save() {
-      document.getElementById("mySavedModel").value = myDiagram.model.toJson();
+      document.getElementById("myLoadModel").value = myDiagram.model.toJson();
       myDiagram.isModified = false;
     }
     function load() {
       myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
+      
+    function loadmymodel() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("myLoadModel").value);
     
 	 document.getElementById("blobButton").addEventListener("click", makeBlob);
   }
@@ -1015,6 +1020,11 @@ motorSound.loop = false;if (colour2 === green) {
     
 	 document.getElementById("blobButton").addEventListener("click", makeBlob);
   }
+                function loadTraffic() {
+      myDiagram.model = go.Model.fromJson(document.getElementById("Traffic").value);
+    
+	 document.getElementById("blobButton").addEventListener("click", makeBlob);
+  }
                   function loadHelp() {
       myDiagram.model = go.Model.fromJson(document.getElementById("Help").value);
     
@@ -1073,7 +1083,12 @@ motorSound.loop = false;if (colour2 === green) {
   <p>
       
     </div>
-    <textarea id="mySavedModel" style="width:100%;height:12px">
+        <textarea id="myLoadModel" style="width:100%;height:12px">
+
+
+
+    </textarea>
+    <textarea id="mySavedModel" style="width:1px;height:12px">
 { "class": "go.GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
@@ -1449,7 +1464,27 @@ motorSound.loop = false;if (colour2 === green) {
 {"from":"NOT1", "to":"AND1", "fromPort":"out", "toPort":"in1", "points":[-8.200000000000003,-220,1.7999999999999972,-220,4,-220,4,-172,-116,-172,-116,-104.4,-114.72,-104.4,-104.72,-104.4]},
 {"from":"AND1", "to":"Lamp1", "fromPort":"out", "toPort":"", "points":[-3.200000000000003,-90,6.799999999999997,-90,4,-90,4,-90,28,-90,28,80,167.20000000000002,80,177.20000000000002,80]}
  ]}
-    </textarea>   <textarea id="Help" style="width:1px;height:0px">
+    </textarea> 
+        </textarea>
+       <textarea id="Traffic" style="width:1px;height:0px">
+{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [ 
+{"category":"Lamp", "key":"Lamp1", "loc":"213.23593750000012 72.00000000000001"},
+{"category":"Label", "loc":"219.99999999999997 21.83671874999999", "text":"GREEN", "key":-17},
+{"category":"Inputs", "key":-20, "loc":"-360 -261.9999999999996"},
+{"category":"Inputs", "key":-11, "loc":"-360 -100", "text":"B"},
+{"category":"Lamp", "key":"Lamp12", "loc":"213.23593750000012 -262"},
+{"category":"Lamp", "key":"Lamp13", "loc":"213.23593750000012 -100"},
+{"category":"Label", "loc":"219.99999999999997 -312.16328125", "text":"RED", "key":-10},
+{"category":"Label", "loc":"219.99999999999997 -150.16328124999998", "text":"AMBER", "key":-12}
+ ],
+  "linkDataArray": []}
+
+    </textarea>
+    
+      <textarea id="Help" style="width:1px;height:0px">
 { "class": "go.GraphLinksModel",
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
