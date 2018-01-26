@@ -13,8 +13,7 @@
 <script src="./extensions/FreehandDrawingTool.js"></script>
   <script src="./extensions/LightBoxContextMenu.js"></script> 
 <script src="./assets/js/GuidedDraggingTool.js"></script> D McLaren
- &nbsp; <button id="blobButton">Save As .PNG</button>   <button onclick="loadTraffic()">Traffic Lights</button>     <button onclick="loadHelp()">Help</button>
-
+&nbsp; <button id="blobButton">Save As .PNG</button>  <button onclick="load()">Decisions</button>     <button onclick="loadTraffic()">Traffic Lights</button>     <button onclick="loadHelp()">Help</button>
 <script id="code">
   
     var red = "forestgreen";  // 0 or false
@@ -25,6 +24,8 @@
 					    var white = "white";
 						var lampoff = "brown";
 						var yellow = "yellow";
+						var black = "black";
+						var amber = "orange";
 		
     function init() {
       if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
@@ -308,6 +309,52 @@ var RotSwitchTemplate =
           visible: true },
         new go.Binding("visible", "error"))
         );
+		
+		
+		      var LampRTemplate =
+		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: "red" }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, "./assets/lightoutput.png",
+              { width: 50, height: 50 }),
+          $(go.Shape, "Rectangle", portStyleB(true),  // the only port
+            { portId: "", alignment: new go.Spot(0.05, 0.5) }),
+						$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error"))
+        );
+		      var LampATemplate =
+		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: "orange" }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, "./assets/lightoutput.png",
+              { width: 50, height: 50 }),
+          $(go.Shape, "Rectangle", portStyleB(true),  // the only port
+            { portId: "", alignment: new go.Spot(0.05, 0.5) }),
+						$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error"))
+        );
+		      var LampGTemplate =
+		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
+          $(go.Shape, "Rectangle", shapeStyle(),
+            { fill: "green" }),  // override the default fill (from shapeStyle()) to be green
+						$(go.Picture, "./assets/lightoutput.png",
+              { width: 50, height: 50 }),
+          $(go.Shape, "Rectangle", portStyleB(true),  // the only port
+            { portId: "", alignment: new go.Spot(0.05, 0.5) }),
+						$(go.Shape, "Rectangle",
+        { alignment: new go.Spot(-0.1, 0.5),
+          fill: "black", width: 15, height: 2,
+          visible: true },
+        new go.Binding("visible", "error"))
+        );
+		
+		
       var buzzerTemplate =
 		$(go.Node, "Spot", nodeStyle(),{ locationSpot: go.Spot.Center,contextMenu: window.myHTMLLightBox },
           $(go.Shape, "Rectangle", shapeStyle(),
@@ -686,6 +733,9 @@ var RotSwitchTemplate =
 			myDiagram.nodeTemplateMap.add("Buzzer", buzzerTemplate);
 			myDiagram.nodeTemplateMap.add("Relay", relayTemplate);
 			myDiagram.nodeTemplateMap.add("Lamp", LampTemplate);
+						myDiagram.nodeTemplateMap.add("LampR", LampRTemplate);
+									myDiagram.nodeTemplateMap.add("LampA", LampATemplate);
+												myDiagram.nodeTemplateMap.add("LampG", LampGTemplate);
 						myDiagram.nodeTemplateMap.add("Label", ConnectorTemplate);
 						myDiagram.nodeTemplateMap.add("Battery", BatteryTemplate);
         myDiagram.nodeTemplateMap.add("Batt", BattTemplate);
@@ -788,6 +838,9 @@ mode(false);
             			case "Buzzer": doOutput(node); break;
 			            case "Relay": doRelay(node); break;
             case "Lamp": doOutputL(node); break;
+			            case "LampR": doOutputLR(node); break;
+						            case "LampA": doOutputLA(node); break;
+									            case "LampG": doOutputLG(node); break;
             case "Temp_Sensor": break;
 			case "Light_Sensor": break;
 			case "Switch": break;
@@ -897,6 +950,7 @@ buzzSound.loop = true;if (color === green) {
       // assume there is just one input link
 	       var color1 = node.findLinksInto().any(linkIsTrue) ? green : red;
 	       var colour = color1 === green ? yellow : red;
+
       // we just need to update the node's Shape.fill
       node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = colour; 
 	  });
@@ -904,7 +958,42 @@ buzzSound.loop = true;if (color === green) {
       setOutputLinks(node, colour);
 	  node.findObject("NODESHAPE").fill = colour
     }
-	
+			function doOutputLR(node) {
+      // assume there is just one input link
+	       var color1 = node.findLinksInto().any(linkIsTrue) ? green : red;
+	       var colour = color1 === green ? green : black;
+
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = colour; 
+	  });
+	   
+      setOutputLinks(node, colour);
+	  node.findObject("NODESHAPE").fill = colour
+    }
+			function doOutputLA(node) {
+      // assume there is just one input link
+	       var color1 = node.findLinksInto().any(linkIsTrue) ? green : red;
+	       var colour = color1 === green ? amber : black;
+
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = colour; 
+	  });
+	   
+      setOutputLinks(node, colour);
+	  node.findObject("NODESHAPE").fill = colour
+    }
+		function doOutputLG(node) {
+      // assume there is just one input link
+	       var color1 = node.findLinksInto().any(linkIsTrue) ? green : red;
+	       var colour = color1 === green ? red : black;
+
+      // we just need to update the node's Shape.fill
+      node.linksConnected.each(function(link) { node.findObject("NODESHAPE").fill = colour; 
+	  });
+	   
+      setOutputLinks(node, colour);
+	  node.findObject("NODESHAPE").fill = colour
+    }
 	
 	     function doInputLS(node) {
      var color1 = node.findObject("NODESHAPE").fill;
@@ -1471,12 +1560,12 @@ motorSound.loop = false;if (colour2 === green) {
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [ 
-{"category":"Lamp", "key":"Lamp1", "loc":"213.23593750000012 72.00000000000001"},
+{"category":"LampR", "key":"LampR1", "loc":"213.23593750000012 72.00000000000001"},
 {"category":"Label", "loc":"219.99999999999997 21.83671874999999", "text":"GREEN", "key":-17},
 {"category":"Inputs", "key":-20, "loc":"-360 -261.9999999999996"},
 {"category":"Inputs", "key":-11, "loc":"-360 -100", "text":"B"},
-{"category":"Lamp", "key":"Lamp12", "loc":"213.23593750000012 -262"},
-{"category":"Lamp", "key":"Lamp13", "loc":"213.23593750000012 -100"},
+{"category":"LampA", "key":"LampA1", "loc":"213.23593750000012 -262"},
+{"category":"LampG", "key":"LampG1", "loc":"213.23593750000012 -100"},
 {"category":"Label", "loc":"219.99999999999997 -312.16328125", "text":"RED", "key":-10},
 {"category":"Label", "loc":"219.99999999999997 -150.16328124999998", "text":"AMBER", "key":-12}
  ],
