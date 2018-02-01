@@ -13,7 +13,7 @@
 <script src="./extensions/FreehandDrawingTool.js"></script>
   <script src="./extensions/LightBoxContextMenu.js"></script> 
 <script src="./assets/js/GuidedDraggingTool.js"></script> D McLaren
-&nbsp; <button id="blobButton">Save As .PNG</button>  <button onclick="load()">Decisions</button>     <button onclick="loadTraffic()">Traffic Lights</button>     <button onclick="loadHelp()">Help</button>
+&nbsp; <button id="blobButton">Save As .PNG</button>   <button onclick="load()">Decisions</button>  <button onclick="loadTraffic()">Traffic Lights</button>     <button onclick="loadHelp()">Help</button>
 <script id="code">
   
     var red = "forestgreen";  // 0 or false
@@ -591,8 +591,8 @@ var RotSwitchTemplate =
 		$(go.Node, "Spot", nodeStyle(),{locationSpot: go.Spot.Center, contextMenu: window.myHTMLLightBox },
 						$(go.Picture, "./assets/plus.png",
               { width: 50, height: 75 }),
-		  $(go.Shape, "Rectangle", portStyleC(false),  // the only port
-            { portId: "out1", alignment: new go.Spot(0.4, 0.5),fromLinkable: true, toLinkable: false, })
+		  $(go.Shape, "Rectangle", portStyleB(false),  // the only port
+            { portId: "out1", alignment: new go.Spot(0.0, 0.5),fromLinkable: true, toLinkable: false, })
         );
         
         var BattTemplate =
@@ -675,7 +675,7 @@ var RotSwitchTemplate =
 						$(go.Picture, MotorOff,
               { width: 50, height: 50 }),
  $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in1", alignment: new go.Spot(0.1, 0.3) })
+            { portId: "in1", alignment: new go.Spot(0.0, 0.3) })
         ,
 		$(go.Shape, "Rectangle",
         { alignment: new go.Spot(-0.06, 0.3),
@@ -683,7 +683,7 @@ var RotSwitchTemplate =
           visible: true },
         new go.Binding("visible", "error")),
           $(go.Shape, "Rectangle", portStyleB(true),
-            { portId: "in2", alignment: new go.Spot(0.1, 0.7) })
+            { portId: "in2", alignment: new go.Spot(0.0, 0.7) })
         ,
 		$(go.Shape, "Rectangle",
         { alignment: new go.Spot(-0.06, 0.7),
@@ -1163,10 +1163,10 @@ motorSound.loop = false;if (colour2 === green) {
 <div id="sample">
   <div style="width:100%; white-space:nowrap;">
     <span style="display: inline-block; vertical-align: top; width:320px">
-      <div id="palette" style="border: solid 1px black; height: 1020px"></div>
+      <div id="palette" style="border: solid 1px black; height: 2000px"></div>
     </span>
     <span style="display: inline-block; vertical-align: top; width: 85%">
-      <div id="myDiagramDiv" style="border: solid 1px black; height: 1020px"></div>
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 2000px"></div>
     </span>
   </div>
   <p>
@@ -1560,12 +1560,12 @@ motorSound.loop = false;if (colour2 === green) {
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [ 
-{"category":"LampR", "key":"LampR1", "loc":"210.34921874999986 -261.99999999999955"},
+{"category":"LampR", "key":"LampR1", "loc":"213.23593750000012 72.00000000000001"},
 {"category":"Label", "loc":"219.99999999999997 21.83671874999999", "text":"GREEN", "key":-17},
 {"category":"Inputs", "key":-20, "loc":"-360 -261.9999999999996"},
 {"category":"Inputs", "key":-11, "loc":"-360 -100", "text":"B"},
-{"category":"LampA", "key":"LampA1", "loc":"210.34921874999984 -100"},
-{"category":"LampG", "key":"LampG1", "loc":"219.9999999999999 72.00000000000001"},
+{"category":"LampA", "key":"LampA1", "loc":"213.23593750000012 -262"},
+{"category":"LampG", "key":"LampG1", "loc":"213.23593750000012 -100"},
 {"category":"Label", "loc":"219.99999999999997 -312.16328125", "text":"RED", "key":-10},
 {"category":"Label", "loc":"219.99999999999997 -150.16328124999998", "text":"AMBER", "key":-12}
  ],
